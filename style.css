@@ -1,0 +1,150 @@
+*
+{
+	margin: 0pt;
+	padding: 0pt;
+
+	/* This prevents drag and select text/images */
+
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	
+    -webkit-user-drag: none;
+    -moz-user-drag: none;
+    -ms-user-drag: none;	
+	
+}
+
+em
+{
+	font-style:normal;
+}
+
+body
+{
+	/* text */
+	
+	background-color:rgb(27,69,65);
+	font-family: helvetica, arial, sans-serif;
+	
+	
+}
+
+/* Arkanoid effect */
+
+#minigame
+{
+	display:block;
+    width:900px;
+    height:360px;
+	background-color:rgb(178,220,175);
+	background-image:url('images/background.png');
+	background-size:100%;
+    image-rendering: crisp-edges;
+	position:absolute;
+    clip: rect(0px, 900px, 360px, 0px);
+}
+
+#vignette
+{
+	display:block;
+    width:900px;
+    height:360px;
+    image-rendering: crisp-edges;
+	position:absolute;
+}
+
+#seaBackground
+{
+	display:block;
+    width:900px;
+    height:44px;
+    image-rendering: crisp-edges;
+	position:absolute;
+    left:0px;
+    top:316px;
+    bottom:0px;
+}
+
+#seaForeground
+{
+	display:block;
+    width:900px;
+    height:33px;
+    image-rendering: crisp-edges;
+	position:absolute;
+    left:0px;
+    top:327px;
+    bottom:0px;
+}
+
+#ship
+{
+	display:block;
+	position:absolute;
+	top:260px;
+	left:130px;
+	
+	width:147px;
+	height:68px;
+}
+
+.stick
+{
+	display:block;
+	position:absolute;
+	top:260px;
+	left:0px;
+	width:51px;
+	height:155px;
+}
+
+/*
+.parallax1Object1
+{
+	display:block;
+	position:absolute;
+    image-rendering: auto;
+}
+*/
+
+#points
+{
+    display:block;
+    position:absolute;
+    right: 60px;
+    top: 20px;
+    text-align:right;
+    color:rgb(179,254,229);
+    font-style:italic;
+    font-family:serif;
+    font-size:21px;
+}
+
+#gameOver
+{
+    font-style:italic;
+    font-family:serif;
+    font-size:50px;
+    color:rgb(255,255,229);
+    text-align:center;
+}
+
+#minigame, #vignette
+{
+    border-radius:20px 20px 0px 0px;    
+}
+
+#gameOver, #minigame
+{
+	display:block;
+	
+	position:absolute;
+	left:50%;
+	top:40%;
+	transform:translate(-50%, -50%);
+    
+}
+
+
