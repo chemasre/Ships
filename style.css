@@ -46,6 +46,17 @@ body
     clip: rect(0px, 900px, 360px, 0px);
 }
 
+#myst
+{
+	display:block;
+    left:0px;
+    top:185px;
+    width:900px;
+    height:175px;
+    image-rendering: crisp-edges;
+	position:absolute;
+}
+
 #vignette
 {
 	display:block;
