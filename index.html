@@ -22,8 +22,9 @@
     var points;
     
     var minigameState;
-    var minigameStatePlay = 0;
-    var minigameStateGameOver = 1;
+    var minigameStateWelcome    = 0;
+    var minigameStatePlay       = 1;
+    var minigameStateGameOver   = 2;
     
     // Menus
     var gameOver;
@@ -32,7 +33,15 @@
     
     // Input
     
-    var inputSpaceWasPressed;
+    var inputJumpWasPressed;
+    
+    // Sound
+    
+    var soundIsPlaying;
+    var soundBackgroundMusicVolume = 0.5;
+    var soundBackgroundMusic;
+    var soundJumpVolume = 0.15;
+    var soundJump;
     
     // Scene
     
@@ -84,20 +93,40 @@
     
     function MinigameInitPlay()
     {
+        points = document.getElementById("points");
+        ship = document.getElementById("ship");
+
+        sticks = new Array();
+        stickPositionsX = new Array();
+        stickPositionsY = new Array();
+        
+        for(var i = 0; i < numSticks; i++)
+        {
+            sticks.push(document.getElementById("stick" + (i + 1)));            
+           
+            stickPositionsX.push(0);
+            stickPositionsY.push(0);
+            
+            sticks[i].style.display = "none";
+        }
+
+        points.style.display = "none";            
+            
+    }
+    
+    function MinigameEnterPlay()
+    {
         // Init minigame
         
         minigameLevel = 0;
         minigameNumLevels = 3;
         minigameLevelTimer = minigameLevelDuration;
     
-        points = document.getElementById("points");
-        
         minigamePoints = 0;
         points.innerHTML = 0;        
+        points.style.display = "block";
 
         // Init ship
-        
-        ship = document.getElementById("ship");
         
         shipPosX = shipStartPosX;
         shipPosY = shipStartPosY;
@@ -109,16 +138,12 @@
         shipSpeedY = 0;
         ship.style.rotate = "0deg";        
         
-        sticks = new Array();
-        stickPositionsX = new Array();
-        stickPositionsY = new Array();
-        
         for(var i = 0; i < numSticks; i++)
         {
             sticks.push(document.getElementById("stick" + (i + 1)));            
            
-            stickPositionsX.push(sceneWidth);
-            stickPositionsY.push(stickTopPosY[minigameLevel]);
+            stickPositionsX[i] = sceneWidth;
+            stickPositionsY[i] = stickTopPosY[minigameLevel];
             
             sticks[i].style.left = stickPositionsX[i] + "px";
             sticks[i].style.top = stickPositionsY[i] + "px";
@@ -133,24 +158,82 @@
     
     }
     
+    function MinigameExitPlay()
+    {
+        points.style.display = "none";
+    }    
+    
+    function MinigameInitWelcome()
+    {
+        welcome = document.getElementById("welcome");
+        welcome.style.display = "none";
+    }
+    
+    function MinigameEnterWelcome()
+    {       
+        welcome.innerHTML = "<div style='font-size:50px'>Sailor of the Myst</div>" +
+                            "<div style='font-size:20px; margin-top:20px'>Click to start</div>";
+        
+        welcome.style.display = "block";
+    }
+    
+    function MinigameFinishWelcome()
+    {
+        welcome.style.display = "none";
+        console.log("Finishing welcome");
+    }
+    
+    function MinigameUpdateWelcome()
+    {
+        if(inputJumpWasPressed)
+        {
+            MinigameFinishWelcome();
+            MinigameEnterPlay();
+            minigameState = minigameStatePlay;
+            
+            if(!soundIsPlaying)
+            {
+                soundBackgroundMusic.play();
+                soundIsPlaying = true;
+            }
+
+        }
+    }
+    
     function MinigameInitGameOver()
+    {
+        gameOver = document.getElementById("gameOver");
+        gameOver.style.display = "none";
+    }
+    
+    function MinigameEnterGameOver()
     {
         gameOver.style.display = "block";
         
-        gameOver.innerHTML = "<div>Game Over!</div><div style='font-size:30px'>points " + (Math.floor(minigamePoints / 10) * 10) +                     "</div>" + "<div style='font-size:20px; margin-top:20px'>Press space to play again</div>"
+        gameOver.innerHTML = "<div>Game Over!</div><div style='font-size:30px'>points " + (Math.floor(minigamePoints / 10) * 10) +                     "</div>" + "<div style='font-size:20px; margin-top:20px'>Click to play again</div>"
     
     }
     
     function MinigameInit()
     {    
-        minigameState = minigameStatePlay;
         
-        gameOver = document.getElementById("gameOver");
-        gameOver.style.display = "none";
+        soundJump = document.getElementById("jumpSound");
+        soundJump.volume = soundJumpVolume;
+
+        soundBackgroundMusic = document.getElementById("backgroundMusic");
+        soundBackgroundMusic.volume = soundBackgroundMusicVolume;
+
+        soundIsPlaying = false;
         
-        MinigameInitPlay();
+        MinigameInitPlay();        
+        MinigameInitWelcome();
+        MinigameInitGameOver();
+        
+        MinigameEnterWelcome();
+        minigameState = minigameStateWelcome;
         
         document.addEventListener('keydown', MinigameOnKeyDown);
+        document.addEventListener('click', MinigameOnClick);
         
         
         minigameTimeStep = 1.0 / minigameFps;
@@ -159,16 +242,16 @@
     
     function MinigameUpdateGameOver()
     {
-        if(inputSpaceWasPressed)
+        if(inputJumpWasPressed)
         {
-            MinigameFinishGameOver();
+            MinigameExitGameOver();
             minigameState = minigameStatePlay;
-            MinigameInitPlay();
+            MinigameEnterPlay();
             console.log("Going to play");
         }
     }
     
-    function MinigameFinishGameOver()
+    function MinigameExitGameOver()
     {
         gameOver.style.display = "none";    
     }
@@ -198,10 +281,11 @@
         
         // Update ship
         
-        if(inputSpaceWasPressed && !shipJumping)
+        if(inputJumpWasPressed && !shipJumping)
         {
             shipSpeedY = shipJumpSpeed;
             shipJumping = true;
+            soundJump.play();
             ship.style.rotate = "-10deg";        
         }    
 
@@ -228,8 +312,9 @@
                 if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
                     shipPosY + shipHeight >= stickPositionsY[i])
                 {
+                    MinigameExitPlay();
                     minigameState = minigameStateGameOver;
-                    MinigameInitGameOver();
+                    MinigameEnterGameOver();
                 }
                     
             }
@@ -297,7 +382,12 @@
    
     function MinigameUpdate()
     {
-        if(minigameState == minigameStatePlay)
+        if(minigameState == minigameStateWelcome)
+        {
+            MinigameUpdateWelcome();  
+            console.log("update welcome");
+        }
+        else if(minigameState == minigameStatePlay)
         {
             MinigameUpdatePlay();
         }
@@ -306,7 +396,7 @@
             MinigameUpdateGameOver();
         }
     
-        inputSpaceWasPressed = false;
+        inputJumpWasPressed = false;
 
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
     }
@@ -315,8 +405,13 @@
     {
         if(e.key == " ")
         {
-            inputSpaceWasPressed = true;
+            inputJumpWasPressed = true;
         }
+    }
+    
+    function MinigameOnClick(e)
+    {
+        inputJumpWasPressed = true;
     }
 
 	</script>
@@ -347,8 +442,11 @@
 		<img id="ship" src="images/ship.png">
 		<img id="seaForeground" src="images/sea-foreground.png">
 		<img id="vignette" src="images/vignette.png">
+        <audio id="jumpSound" src="sounds/jump.wav"></audio>
+        <audio id="backgroundMusic" src="sounds/background.wav"></audio>
         <div id="points">0</div>
-        <div id="gameOver"><div>Game over!<div><div>score 210</div></div>
+        <div id="gameOver"><div>Game over!</div><div>score 210</div></div>
+        <div id="welcome"><div>Sail</div><div>click to start</div></div>
 	</div>
 <script>
 
