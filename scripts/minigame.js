@@ -5,16 +5,22 @@
     
     var minigamePoints;
     var minigamePointsPerDistance = 0.1;
-    var minigamePointsPerStick = 100;
+    var minigamePointsPerStick = 0;
+	
+	var minigameRecordPoints;
+	var minigameRecordExists;
     
     var minigameLevel = 0;
     var minigameLevelDuration = 10;
     var minigameNumLevels = 3;
+	var minigameLevelMessages = ["no compass can help me", "where is everybody?", "I am just a boat"];
     var minigameLevelChanging;
     
     var minigameLevelTimer;
     
     var points;
+    var message;
+
     
     var minigameState;
     var minigameStateWelcome    = 0;
@@ -110,7 +116,14 @@
     
     function MinigameInitPlay()
     {
+		var storedRecord = localStorage.getItem("record");
+		console.log("Record stored " + storedRecord);
+		
+		if(storedRecord != null) { minigameRecordPoints = parseInt(storedRecord); minigameRecordExists = true; }
+		else { minigameRecordPoints = 0; minigameRecordExists = false; }
+		
         points = document.getElementById("points");
+        message = document.getElementById("message");
         ship = document.getElementById("ship");
 
         sticks = new Array();
@@ -144,7 +157,8 @@
             }
         }
 
-        points.style.display = "none";            
+        points.style.opacity = 0;            
+        message.style.opacity = 0;            
             
     }
     
@@ -158,7 +172,9 @@
     
         minigamePoints = 0;
         points.innerHTML = 0;        
-        points.style.display = "block";
+        points.style.opacity = 1;
+		
+		message.style.opacity = 0;
         
         // Init parallax
         
@@ -212,7 +228,9 @@
     
     function MinigameExitPlay()
     {
-        points.style.display = "none";
+        points.style.opacity = 0;		
+		localStorage.setItem("record", minigamePoints.toString());
+		console.log("Stored: " + minigamePoints.toString());
     }
     
     function MinigameFindSpawnable(array)
@@ -248,6 +266,8 @@
                 if(minigameLevelTimer < 0)
                 {
                     minigameLevelChanging = true;
+					message.style.opacity = 1;
+					message.innerHTML = "<div style='font-size:30px'>" + minigameLevelMessages[minigameLevel] + "</div>"
                     console.log("Changing level");
                 }
 
@@ -256,6 +276,7 @@
             {
                 if(stickLastSpawnGroupChanceX < -stickWidth)
                 {
+					message.style.opacity = 0;
                     minigameLevelChanging = false;
                     minigameLevelTimer = minigameLevelDuration;
                     minigameLevel ++;
@@ -436,20 +457,21 @@
     function MinigameInitWelcome()
     {
         welcome = document.getElementById("welcome");
-        welcome.style.display = "none";
+        welcome.style.opacity = 0;
     }
     
     function MinigameEnterWelcome()
     {       
         welcome.innerHTML = "<div style='font-size:50px'>Sailor of the Myst</div>" +
+							(minigameRecordExists ? "<div style='font-size:16px; margin-top:20px'>farthest " + (Math.floor(minigameRecordPoints / 10) * 10) + "</div>":"") +
                             "<div style='font-size:20px; margin-top:20px'>Click to start</div>";
         
-        welcome.style.display = "block";
+        welcome.style.opacity = 1;
     }
     
     function MinigameFinishWelcome()
     {
-        welcome.style.display = "none";
+        welcome.style.opacity = 0;
         console.log("Finishing welcome");
     }
     
@@ -477,20 +499,21 @@
     function MinigameInitGameOver()
     {
         gameOver = document.getElementById("gameOver");
-        gameOver.style.display = "none";
+        gameOver.style.opacity = 0;
     }
         
     function MinigameEnterGameOver()
     {
-        gameOver.style.display = "block";
+        gameOver.style.opacity = 1;
         
-        gameOver.innerHTML = "<div>Game Over!</div><div style='font-size:30px'>points " + (Math.floor(minigamePoints / 10) * 10) +                     "</div>" + "<div style='font-size:20px; margin-top:20px'>Click to play again</div>"
+        gameOver.innerHTML = "<div>Game Over!</div><div style='font-size:16px'>sailed " + (Math.floor(minigamePoints / 10) * 10) + 
+							 "</div>" + "<div style='font-size:20px; margin-top:20px'>Click to play again</div>"
     
     }
     
     function MinigameExitGameOver()
     {
-        gameOver.style.display = "none";    
+        gameOver.style.opacity = 0;
     }
         
     
