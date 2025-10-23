@@ -155,6 +155,8 @@ body
 
 	opacity: 0.0;
 	transition: opacity 0.5s ease-in-out;
+	
+	text-shadow: 0 0 10px #fff;
 
     font-style:italic;
     font-family:serif;
