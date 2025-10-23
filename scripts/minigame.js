@@ -44,6 +44,22 @@
     
     var sceneWidth = 900;
     
+    // Parallax
+    
+    var parallaxObjects;
+    var parallaxObjectsX;
+    var parallaxNumObjects = [3, 2];
+    var parallaxNumPlanes = 2;
+    
+    var parallaxMinSeparation = [600, 1200];
+    var parallaxMaxSeparation = [1200, 5000];
+    var parallaxSeparation = [0, 0];
+    
+    var parallaxSpeedFactor = [0.2, 0.05];
+    
+    var parallaxLastSpawnX = [0, 0];
+    
+    
     // Ship
 
     var shipStartPosX = 130;
@@ -110,6 +126,23 @@
             
             sticks[i].style.display = "none";
         }
+        
+        parallaxObjects = new Array();
+        parallaxObjectsX = new Array();
+        
+        for(var i = 0; i < parallaxNumPlanes; i++)
+        {
+            parallaxObjects.push(new Array());
+            parallaxObjectsX.push(new Array());
+            
+            for(var j = 0; j < parallaxNumObjects[i]; j++)
+            {
+                parallaxObjects[i].push(document.getElementById("parallax" + (i + 1) + "Object" + (j + 1)));
+                
+                parallaxObjects[i][j].style.display = "none";
+                parallaxObjectsX[i][j] = 0;
+            }
+        }
 
         points.style.display = "none";            
             
@@ -126,6 +159,21 @@
         minigamePoints = 0;
         points.innerHTML = 0;        
         points.style.display = "block";
+        
+        // Init parallax
+        
+        
+        for(var i = 0; i < parallaxNumPlanes; i++)
+        {
+            parallaxLastSpawnX[i] = sceneWidth;
+
+            parallaxSeparation[i] = parallaxMinSeparation[i] + (parallaxMaxSeparation[i] - parallaxMinSeparation[i]) * Math.random();
+            
+            for(var j = 0; j < parallaxNumObjects[i]; j++)
+            {
+                parallaxObjects[i][j].style.display = "none";
+            }
+        }
 
         // Init ship
         
@@ -137,7 +185,9 @@
         
         shipJumping = false;
         shipSpeedY = 0;
-        ship.style.rotate = "0deg";        
+        ship.style.rotate = "0deg";   
+
+        // Init sticks
         
         for(var i = 0; i < numSticks; i++)
         {
@@ -222,6 +272,45 @@
                           Math.abs(sceneSpeedX[minigameLevel]) * minigameTimeStep;
                           
         points.innerHTML = Math.floor(minigamePoints / 10) * 10;
+        
+        // Update parallax
+        
+        for(var i = 0; i < parallaxNumPlanes; i++)
+        {
+            parallaxLastSpawnX[i] += sceneSpeedX[minigameLevel] * minigameTimeStep;
+            
+            if(parallaxLastSpawnX[i] < -parallaxSeparation[i])
+            {
+                var index = MinigameFindSpawnable(parallaxObjects[i]);
+                
+                if(index >= 0)
+                {
+                    console.log("Spawning object at plane " + (i + 1));
+                    
+                    parallaxObjectsX[i][index] = sceneWidth;
+                    parallaxObjects[i][index].style.display = "block";
+                    
+                    parallaxLastSpawnX[i] = sceneWidth;
+                    
+                    parallaxSeparation[i] = parallaxMinSeparation[i] + (parallaxMaxSeparation[i] - parallaxMinSeparation[i]) * Math.random();
+
+                }
+                
+            }
+            
+            for(var j = 0; j < parallaxNumObjects[i]; j++)
+            {
+                if(parallaxObjects[i][j].style.display != "none")
+                {
+                    parallaxObjectsX[i][j] += sceneSpeedX[minigameLevel] * parallaxSpeedFactor[i] * minigameTimeStep;
+                    
+                    if(parallaxObjectsX[i][j] < -900) { parallaxObjects[i][j].style.display = "none"; }
+                    
+                    parallaxObjects[i][j].style.left = parallaxObjectsX[i][j] + "px";
+                }
+            }
+        }
+
         
         // Update ship
         

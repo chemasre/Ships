@@ -111,6 +111,13 @@ body
 	height:155px;
 }
 
+.parallaxObject
+{
+	display:block;
+	position:absolute;
+    bottom:0px;
+}
+
 /*
 .parallax1Object1
 {
