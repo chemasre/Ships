@@ -13,7 +13,7 @@
     var minigameLevel = 0;
     var minigameLevelDuration = 10;
     var minigameNumLevels = 3;
-	var minigameLevelMessages = ["", "no compass can help me", "they all float"];
+	var minigameLevelMessages = ["", "no compass can help me", "oh yes! they float, Georgie"];
     var minigameLevelChanging;
     
     var minigameLevelTimer;
@@ -33,7 +33,7 @@
     var gameOverRestart;
     
     var gameOverRestartTimer;
-    var gameOverRestartDelay = 2.0;
+    var gameOverRestartDelay = 0.5;
     
     var welcome;
     
@@ -251,7 +251,7 @@
     function MinigameExitPlay()
     {
         ship.style.display = "none";
-        ship.rotate = "0deg";
+        ship.style.rotate = "0deg";
         
         points.style.opacity = 0;
         
@@ -392,7 +392,7 @@
         
         // Update ship
         
-        if(inputJumpWasPressed && !shipJumping)
+        if(inputJumpWasPressed && !shipJumping && !shipDead)
         {
             shipSpeedY = shipJumpSpeed;
             shipJumping = true;
@@ -417,26 +417,32 @@
         }
         else if(shipDead)
         {
-            shipPosY += shipSinkSpeed * minigameTimeStep;
-            ship.style.rotate = "70deg";
+			if(shipPosY < sceneHeight)
+			{
+				shipPosY += shipSinkSpeed * minigameTimeStep;
+				ship.style.rotate = "70deg";
+			}
         }
         
-        for(var i = 0; i < numSticks; i++)
-        {
-            if(sticks[i].style.display != "none")
-            {
-                if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
-                    shipPosY + shipHeight >= stickPositionsY[i])
-                {
-                    shipDead = true;
-                    if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
-                    sceneTargetSpeedX = 0;
-                    minigameState = minigameStateGameOver;
-                    MinigameEnterGameOver();
-                }
-                    
-            }
-        }
+		if(!shipDead)
+		{
+			for(var i = 0; i < numSticks; i++)
+			{
+				if(sticks[i].style.display != "none")
+				{
+					if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
+						shipPosY + shipHeight >= stickPositionsY[i])
+					{
+						shipDead = true;
+						if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
+						sceneTargetSpeedX = 0;
+						minigameState = minigameStateGameOver;
+						MinigameEnterGameOver();
+					}
+						
+				}
+			}
+		}
         
         ship.style.left = shipPosX + "px";
         ship.style.top = shipPosY + "px";    
@@ -574,6 +580,8 @@
         gameOver.style.opacity = 1;        
         gameOverScore.innerHTML = "sailed " + (Math.floor(minigamePoints / 10) * 10);
         gameOverRestart.style.opacity = 0;
+		
+		console.log("Entering game over");
         
         gameOverRestartTimer = gameOverRestartDelay;
                              
@@ -591,8 +599,8 @@
     {
         if(shipPosY > sceneHeight)
         {
-            ship.rotate = "0deg";
-
+            ship.style.rotate = "0deg";
+			
             if(gameOverRestartTimer > 0)
             {
                 gameOverRestartTimer -= minigameTimeStep;
@@ -652,7 +660,6 @@
         if(minigameState == minigameStateWelcome)
         {
             MinigameUpdateWelcome();  
-            console.log("update welcome");
         }
         else if(minigameState == minigameStatePlay)
         {
