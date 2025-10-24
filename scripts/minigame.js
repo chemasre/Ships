@@ -13,7 +13,7 @@
     var minigameLevel = 0;
     var minigameLevelDuration = 10;
     var minigameNumLevels = 3;
-	var minigameLevelMessages = ["no compass can help me", "where is everybody?", "I am just a boat"];
+	var minigameLevelMessages = ["", "no compass can help me", "they all float"];
     var minigameLevelChanging;
     
     var minigameLevelTimer;
@@ -29,6 +29,12 @@
     
     // Menus
     var gameOver;
+    var gameOverScore;
+    var gameOverRestart;
+    
+    var gameOverRestartTimer;
+    var gameOverRestartDelay = 2.0;
+    
     var welcome;
     
     
@@ -46,9 +52,13 @@
     
     // Scene
     
-    var sceneSpeedX = [-400, -500, -700];
+    var sceneLevelSpeedX = [-400, -500, -700];
+    var sceneTargetSpeedX;
+    var sceneAccelerationX = 200;
+    var sceneSpeedX;
     
     var sceneWidth = 900;
+    var sceneHeight = 360;
     
     // Parallax
     
@@ -81,7 +91,9 @@
     var shipWidth = 147;
     var shipHeight = 68;
     
-    var shipCollisionWidth = 30;
+    var shipCollisionWidth = 30
+    var shipDead;
+    var shipSinkSpeed = 100;
     
     var ship;
     
@@ -125,6 +137,7 @@
         points = document.getElementById("points");
         message = document.getElementById("message");
         ship = document.getElementById("ship");
+        
 
         sticks = new Array();
         stickPositionsX = new Array();
@@ -156,7 +169,7 @@
                 parallaxObjectsX[i][j] = 0;
             }
         }
-
+        
         points.style.opacity = 0;            
         message.style.opacity = 0;            
             
@@ -176,6 +189,11 @@
 		
 		message.style.opacity = 0;
         
+        // Init scene 
+        
+        sceneSpeedX = 0;
+        sceneTargetSpeedX = sceneLevelSpeedX[0];        
+        
         // Init parallax
         
         
@@ -193,6 +211,8 @@
 
         // Init ship
         
+        ship.style.display = "block";
+        
         shipPosX = shipStartPosX;
         shipPosY = shipStartPosY;
         
@@ -201,7 +221,9 @@
         
         shipJumping = false;
         shipSpeedY = 0;
-        ship.style.rotate = "0deg";   
+        ship.style.rotate = "0deg"; 
+
+        shipDead = false;
 
         // Init sticks
         
@@ -228,9 +250,19 @@
     
     function MinigameExitPlay()
     {
-        points.style.opacity = 0;		
-		localStorage.setItem("record", minigamePoints.toString());
-		console.log("Stored: " + minigamePoints.toString());
+        ship.style.display = "none";
+        ship.rotate = "0deg";
+        
+        points.style.opacity = 0;
+        
+        if(minigameRecordExists)
+        {
+            if(minigamePoints > minigameRecordPoints)
+            {
+                localStorage.setItem("record", minigamePoints.toString());
+                console.log("Stored: " + minigamePoints.toString());
+            }
+        }
     }
     
     function MinigameFindSpawnable(array)
@@ -258,7 +290,12 @@
     {
         // Update level
         
-        if(minigameLevel < minigameNumLevels - 1)
+        if(shipDead)
+        {
+            message.style.opacity = 0;
+            minigameLevelChanging = false;
+        }
+        else if(minigameLevel < minigameNumLevels - 1)
         {
             if(!minigameLevelChanging)
             {
@@ -267,7 +304,7 @@
                 {
                     minigameLevelChanging = true;
 					message.style.opacity = 1;
-					message.innerHTML = "<div style='font-size:30px'>" + minigameLevelMessages[minigameLevel] + "</div>"
+					message.innerHTML = "<div style='font-size:30px'>" + minigameLevelMessages[minigameLevel + 1] + "</div>"
                     console.log("Changing level");
                 }
 
@@ -279,7 +316,10 @@
 					message.style.opacity = 0;
                     minigameLevelChanging = false;
                     minigameLevelTimer = minigameLevelDuration;
+                    sceneTargetSpeedX = sceneLevelSpeedX[minigameLevel + 1];
                     minigameLevel ++;
+                    
+                    
                     console.log("Increased level");
                 }
                             
@@ -289,16 +329,33 @@
         
         // Update points
         
-        minigamePoints += minigamePointsPerDistance *
-                          Math.abs(sceneSpeedX[minigameLevel]) * minigameTimeStep;
-                          
-        points.innerHTML = Math.floor(minigamePoints / 10) * 10;
+        if(!shipDead)
+        {
+            minigamePoints += minigamePointsPerDistance *
+                              Math.abs(sceneSpeedX) * minigameTimeStep;
+                              
+            points.innerHTML = Math.floor(minigamePoints / 10) * 10;
+        }
+        
+        // Update scene
+        
+        if(sceneSpeedX < sceneTargetSpeedX)
+        {
+            sceneSpeedX += sceneAccelerationX * minigameTimeStep;
+            if(sceneSpeedX > sceneTargetSpeedX) { sceneSpeedX = sceneTargetSpeedX; }
+        }
+        else if(sceneSpeedX > sceneTargetSpeedX)
+        {
+            sceneSpeedX -= sceneAccelerationX * minigameTimeStep;
+            if(sceneSpeedX < sceneTargetSpeedX) { sceneSpeedX = sceneTargetSpeedX; }
+        }
+                              
         
         // Update parallax
         
         for(var i = 0; i < parallaxNumPlanes; i++)
         {
-            parallaxLastSpawnX[i] += sceneSpeedX[minigameLevel] * minigameTimeStep;
+            parallaxLastSpawnX[i] += sceneSpeedX * minigameTimeStep;
             
             if(parallaxLastSpawnX[i] < -parallaxSeparation[i])
             {
@@ -323,7 +380,7 @@
             {
                 if(parallaxObjects[i][j].style.display != "none")
                 {
-                    parallaxObjectsX[i][j] += sceneSpeedX[minigameLevel] * parallaxSpeedFactor[i] * minigameTimeStep;
+                    parallaxObjectsX[i][j] += sceneSpeedX * parallaxSpeedFactor[i] * minigameTimeStep;
                     
                     if(parallaxObjectsX[i][j] < -900) { parallaxObjects[i][j].style.display = "none"; }
                     
@@ -358,6 +415,11 @@
                 ship.style.rotate = "0deg";        
             }
         }
+        else if(shipDead)
+        {
+            shipPosY += shipSinkSpeed * minigameTimeStep;
+            ship.style.rotate = "70deg";
+        }
         
         for(var i = 0; i < numSticks; i++)
         {
@@ -366,7 +428,9 @@
                 if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
                     shipPosY + shipHeight >= stickPositionsY[i])
                 {
-                    MinigameExitPlay();
+                    shipDead = true;
+                    if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
+                    sceneTargetSpeedX = 0;
                     minigameState = minigameStateGameOver;
                     MinigameEnterGameOver();
                 }
@@ -421,7 +485,7 @@
         
         }
 
-        stickLastSpawnGroupChanceX += sceneSpeedX[minigameLevel] * minigameTimeStep;
+        stickLastSpawnGroupChanceX += sceneSpeedX * minigameTimeStep;
         
         for(var i = 0; i < numSticks; i++)
         {
@@ -429,11 +493,11 @@
             {
                 var behindShipBefore = (stickPositionsX[i] < shipPosX);
             
-                stickPositionsX[i] += sceneSpeedX[minigameLevel] * minigameTimeStep;
+                stickPositionsX[i] += sceneSpeedX * minigameTimeStep;
             
                 var behindShipAfter = (stickPositionsX[i] < shipPosX);
                 
-                if(!behindShipBefore && behindShipAfter) { minigamePoints += minigamePointsPerStick; }
+                if(!behindShipBefore && behindShipAfter && !shipDead) { minigamePoints += minigamePointsPerStick; }
 
                 if(stickPositionsX[i] <= -stickKillDistance)
                 {
@@ -499,32 +563,54 @@
     function MinigameInitGameOver()
     {
         gameOver = document.getElementById("gameOver");
+        gameOverScore = document.getElementById("gameOverScore");
+        gameOverRestart = document.getElementById("gameOverRestart");
         gameOver.style.opacity = 0;
+        gameOverRestart.style.opacity = 0;
     }
         
     function MinigameEnterGameOver()
     {
-        gameOver.style.opacity = 1;
+        gameOver.style.opacity = 1;        
+        gameOverScore.innerHTML = "sailed " + (Math.floor(minigamePoints / 10) * 10);
+        gameOverRestart.style.opacity = 0;
         
-        gameOver.innerHTML = "<div>Game Over!</div><div style='font-size:16px'>sailed " + (Math.floor(minigamePoints / 10) * 10) + 
-							 "</div>" + "<div style='font-size:20px; margin-top:20px'>Click to play again</div>"
+        gameOverRestartTimer = gameOverRestartDelay;
+                             
     
     }
     
     function MinigameExitGameOver()
     {
         gameOver.style.opacity = 0;
+        gameOverRestart.style.opacity = 0;
     }
         
     
     function MinigameUpdateGameOver()
     {
-        if(inputJumpWasPressed)
+        if(shipPosY > sceneHeight)
         {
-            MinigameExitGameOver();
-            minigameState = minigameStatePlay;
-            MinigameEnterPlay();
-            console.log("Going to play");
+            ship.rotate = "0deg";
+
+            if(gameOverRestartTimer > 0)
+            {
+                gameOverRestartTimer -= minigameTimeStep;
+            }
+            else
+            {
+                gameOverRestart.style.opacity = 1;
+                
+                if(inputJumpWasPressed)
+                {
+                    MinigameExitPlay();
+                    MinigameExitGameOver();
+                    minigameState = minigameStatePlay;
+                    MinigameEnterPlay();
+                    console.log("Going to play");
+                }
+                
+            }
         }
     }    
     
@@ -574,6 +660,7 @@
         }
         else // minigameState == minigameStateGameOver
         {
+            MinigameUpdatePlay();
             MinigameUpdateGameOver();
         }
     

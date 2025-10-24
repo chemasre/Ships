@@ -99,6 +99,8 @@ body
 	
 	width:147px;
 	height:68px;
+    
+	transition: rotate 0.15s ease-in-out;    
 }
 
 .stick
@@ -168,6 +170,18 @@ body
 	left:50%;
 	top:42%;
 	transform:translate(-50%, -50%);
+}
+
+#gameOverScore
+{
+    font-size:16px;
+}
+
+#gameOverRestart
+{
+    font-size:20px;
+    margin-top:20px;
+	transition: opacity 0.5s ease-in-out;
 }
 
 
