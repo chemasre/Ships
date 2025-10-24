@@ -20,12 +20,14 @@
     
     var points;
     var message;
-
     
     var minigameState;
     var minigameStateWelcome    = 0;
     var minigameStatePlay       = 1;
     var minigameStateGameOver   = 2;
+	
+	var minigameSwitchNoSticks = false;
+	var minigameSwitchNoSound = false;
     
     // Menus
     var gameOver;
@@ -72,7 +74,10 @@
     
     var parallaxObjects;
     var parallaxObjectsX;
-    var parallaxNumObjects = [3, 2];
+    var parallaxObjectsSpeedFactor;
+	var parallaxObjectsSpeedFactorMin = 0.5;
+	var parallaxObjectsSpeedFactorMax = 1.5;
+    var parallaxNumObjects = [4, 2];
     var parallaxNumPlanes = 2;
     
     var parallaxMinSeparation = [600, 700];
@@ -163,11 +168,13 @@
         
         parallaxObjects = new Array();
         parallaxObjectsX = new Array();
+        parallaxObjectsSpeedFactor = new Array();
         
         for(var i = 0; i < parallaxNumPlanes; i++)
         {
             parallaxObjects.push(new Array());
             parallaxObjectsX.push(new Array());
+            parallaxObjectsSpeedFactor.push(new Array());
             
             for(var j = 0; j < parallaxNumObjects[i]; j++)
             {
@@ -175,6 +182,7 @@
                 
                 parallaxObjects[i][j].style.display = "none";
                 parallaxObjectsX[i][j] = 0;
+				parallaxObjectsSpeedFactor[i][j] = 0;
             }
         }
         
@@ -209,7 +217,7 @@
         {
             parallaxLastSpawnX[i] = 0;
 
-            parallaxSeparation[i] = parallaxMinSeparation[i] + (parallaxMaxSeparation[i] - parallaxMinSeparation[i]) * Math.random();
+            parallaxSeparation[i] = MinigameRandomRange(parallaxMinSeparation[i], parallaxMaxSeparation[i]);
             
             for(var j = 0; j < parallaxNumObjects[i]; j++)
             {
@@ -250,6 +258,7 @@
         }
         
         sticks[0].style.display = "block";
+        if(minigameSwitchNoSticks) { sticks[0].style.display = "none"; }
         stickPositionsX[0] = sceneWidth;
         stickLastSpawnGroupChanceX = sceneWidth;
         stickSpawnGroupMissedChances = 0;
@@ -284,18 +293,25 @@
 			
 		}
     }
-    
-    function MinigameFindSpawnable(array)
+	    
+    function MinigameFindRandomSpawnable(array)
+    {
+		return MinigameFindSpawnableFrom(array, MinigameRandomRangeInt(0, array.length));
+    }
+
+    function MinigameFindSpawnableFrom(array, fromIndex)
     {
         var found = false;
         var i = 0;
         var result = -1;
         while(!found && i < array.length)
         {
-            if(array[i].style.display == "none")
+			var index = (fromIndex + i) % array.length;
+			
+            if(array[index].style.display == "none")
             {
                 found = true;
-                result = i;
+                result = index;
             }
             else
             {
@@ -304,6 +320,11 @@
         }
         
         return result;
+    }
+
+    function MinigameFindSpawnable(array)
+    {
+        return MinigameFindSpawnableFrom(array, 0);
     }
 
     function MinigameUpdatePlay()
@@ -379,18 +400,19 @@
             
             if(sceneWidth - parallaxLastSpawnX[i] > parallaxSeparation[i])
             {				
-                var index = MinigameFindSpawnable(parallaxObjects[i]);
+                var index = MinigameFindRandomSpawnable(parallaxObjects[i]);
                 
                 if(index >= 0)
                 {
                     console.log("Spawning object at plane " + (i + 1));
                     
                     parallaxObjectsX[i][index] = sceneWidth;
+					parallaxObjectsSpeedFactor[i][index] = MinigameRandomRange(parallaxObjectsSpeedFactorMin, parallaxObjectsSpeedFactorMax);
                     parallaxObjects[i][index].style.display = "block";
                     
                     parallaxLastSpawnX[i] = sceneWidth;
                     
-                    parallaxSeparation[i] = parallaxMinSeparation[i] + (parallaxMaxSeparation[i] - parallaxMinSeparation[i]) * Math.random();
+                    parallaxSeparation[i] = MinigameRandomRange(parallaxMinSeparation[i], parallaxMaxSeparation[i]);
 
                 }
                 
@@ -400,7 +422,7 @@
             {
                 if(parallaxObjects[i][j].style.display != "none")
                 {
-                    parallaxObjectsX[i][j] += sceneSpeedX * parallaxSpeedFactor[i] * minigameTimeStep;
+                    parallaxObjectsX[i][j] += sceneSpeedX * parallaxSpeedFactor[i] * parallaxObjectsSpeedFactor[i][j] * minigameTimeStep;
                     
                     if(parallaxObjectsX[i][j] < -900) { parallaxObjects[i][j].style.display = "none"; }
                     
@@ -480,6 +502,7 @@
                 if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
                 {
                     sticks[spawnableIndex].style.display = "block";
+					if(minigameSwitchNoSticks) { sticks[spawnableIndex].style.display = "none"; }
                     
                     var groupMembers = Math.floor((Math.random() * 1000)) % stickSpawnGroupMaxMembers[minigameLevel];
                     
@@ -493,6 +516,7 @@
                             stickPositionsX[groupMemberIndex] = sceneWidth + stickSpawnGroupMemberSeparation[minigameLevel] * (i + 1);
                             stickPositionsY[groupMemberIndex] = stickTopPosY[minigameLevel];   
                             sticks[groupMemberIndex].style.display = "block";
+							if(minigameSwitchNoSticks) { sticks[groupMemberIndex].style.display = "none"; }
                         }
                     }
                     
@@ -689,10 +713,14 @@
         
         soundJump = document.getElementById("jumpSound");
         soundJump.volume = soundJumpVolume;
+		
+		if(minigameSwitchNoSound) { soundJump.volume = 0; }
 
         soundBackgroundMusic = document.getElementById("backgroundMusic");
         soundBackgroundMusic.volume = soundBackgroundMusicVolume;
         soundBackgroundMusic.loop = true;
+
+		if(minigameSwitchNoSound) { soundBackgroundMusic.volume = 0; }
 
         soundIsPlaying = false;
         
@@ -744,3 +772,18 @@
     {
         inputJumpWasPressed = true;
     }
+	
+	function MinigameRandomRange(a, b)
+	{
+		return a + (b - a) * Math.random();		
+	}
+
+	function MinigameRandomRangeInt(a, b)
+	{
+		var r = a + Math.floor((b - a) * Math.random());
+		
+		if(r == b) { r = r - 1; }
+		
+		return r;
+		
+	}
