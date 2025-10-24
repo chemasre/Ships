@@ -28,10 +28,12 @@ body
 	background-color:rgb(27,69,65);
 	font-family: helvetica, arial, sans-serif;
 	
+	overflow:hidden;
+	
 	
 }
 
-/* Arkanoid effect */
+
 
 #minigame
 {
@@ -136,6 +138,8 @@ body
 	opacity: 0.0;
 	transition: opacity 0.5s ease-in-out;
 	
+	text-shadow: 0 0 10px rgb(179,254,229);	
+	
     position:absolute;
     right: 60px;
     top: 20px;
@@ -177,13 +181,23 @@ body
     font-size:16px;
 }
 
-#gameOverRestart
+#welcomeStart, #gameOverRestart
 {
     font-size:20px;
     margin-top:20px;
 	transition: opacity 0.5s ease-in-out;
 }
 
+#welcome
+{
+	font-size:50px;
+}
+
+#welcomeScore
+{
+	font-size:16px;
+	margin-top:20px;	
+}
 
 #minigame
 {

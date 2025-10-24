@@ -31,12 +31,20 @@
     var gameOver;
     var gameOverScore;
     var gameOverRestart;
+	var gameOverRestartBlinkOn;
+	var gameOverRestartBlinkTimer;
     
     var gameOverRestartTimer;
     var gameOverRestartDelay = 0.5;
     
     var welcome;
-    
+	var welcomeScore;
+	var welcomeStart;
+	var welcomeStartBlinkOn;
+	var welcomeStartBlinkTimer;
+	
+
+	var menuBlinkInterval = 0.6;
     
     // Input
     
@@ -129,7 +137,7 @@
     function MinigameInitPlay()
     {
 		var storedRecord = localStorage.getItem("record");
-		console.log("Record stored " + storedRecord);
+		console.log("Recovered record " + storedRecord);
 		
 		if(storedRecord != null) { minigameRecordPoints = parseInt(storedRecord); minigameRecordExists = true; }
 		else { minigameRecordPoints = 0; minigameRecordExists = false; }
@@ -254,15 +262,27 @@
         ship.style.rotate = "0deg";
         
         points.style.opacity = 0;
+		
+		var storeRecord = false;
         
         if(minigameRecordExists)
         {
             if(minigamePoints > minigameRecordPoints)
             {
-                localStorage.setItem("record", minigamePoints.toString());
-                console.log("Stored: " + minigamePoints.toString());
+				storeRecord = true;
             }
         }
+		else
+		{
+			storeRecord = true;
+		}
+		
+		if(storeRecord)
+		{
+			localStorage.setItem("record", minigamePoints.toString());
+			console.log("Stored: " + minigamePoints.toString());
+			
+		}
     }
     
     function MinigameFindSpawnable(array)
@@ -528,15 +548,31 @@
     {
         welcome = document.getElementById("welcome");
         welcome.style.opacity = 0;
+		
+        welcomeScore = document.getElementById("welcomeScore");
+
+		welcomeStart = document.getElementById("welcomeStart");
+		welcomeStart.style.opacity = 0;
     }
     
     function MinigameEnterWelcome()
-    {       
-        welcome.innerHTML = "<div style='font-size:50px'>Sailor of the Myst</div>" +
-							(minigameRecordExists ? "<div style='font-size:16px; margin-top:20px'>farthest " + (Math.floor(minigameRecordPoints / 10) * 10) + "</div>":"") +
-                            "<div style='font-size:20px; margin-top:20px'>Click to start</div>";
-        
+    {  
+		welcomeStartBlinkOn = true;
+		welcomeStartBlinkTimer = menuBlinkInterval;
+	
         welcome.style.opacity = 1;
+
+		if(minigameRecordExists)
+		{
+			welcomeScore.style.display = "block";
+			welcomeScore.innerHTML = "farthest " + (Math.floor(minigameRecordPoints / 10) * 10);
+		}
+		else
+		{
+			welcomeScore.style.display = "none";			
+		}
+        
+        welcomeStart.style.opacity = 1;
     }
     
     function MinigameFinishWelcome()
@@ -547,6 +583,14 @@
     
     function MinigameUpdateWelcome()
     {
+		if(welcomeStartBlinkOn) { welcomeStart.style.opacity = 1; }
+		else { welcomeStart.style.opacity = 0.6; }
+		welcomeStartBlinkTimer -= minigameTimeStep;
+		if(welcomeStartBlinkTimer <= 0)
+		{   welcomeStartBlinkOn = !welcomeStartBlinkOn;
+			welcomeStartBlinkTimer = menuBlinkInterval;
+		}
+				
         if(inputJumpWasPressed)
         {
             MinigameFinishWelcome();
@@ -577,8 +621,14 @@
         
     function MinigameEnterGameOver()
     {
+	    points.style.opacity = 0;            
+	
         gameOver.style.opacity = 1;        
         gameOverScore.innerHTML = "sailed " + (Math.floor(minigamePoints / 10) * 10);
+
+		gameOverRestartBlinkOn = true;
+		gameOverRestartBlinkTimer = menuBlinkInterval;
+
         gameOverRestart.style.opacity = 0;
 		
 		console.log("Entering game over");
@@ -607,7 +657,13 @@
             }
             else
             {
-                gameOverRestart.style.opacity = 1;
+				if(gameOverRestartBlinkOn) { gameOverRestart.style.opacity = 1; }
+				else { gameOverRestart.style.opacity = 0.6; }
+				gameOverRestartBlinkTimer -= minigameTimeStep;
+				if(gameOverRestartBlinkTimer <= 0)
+				{   gameOverRestartBlinkOn = !gameOverRestartBlinkOn;
+					gameOverRestartBlinkTimer = menuBlinkInterval;
+				}
                 
                 if(inputJumpWasPressed)
                 {
