@@ -179,6 +179,7 @@ body
 #gameOverScore
 {
     font-size:16px;
+	margin-top:5px;	
 }
 
 #welcomeStart, #gameOverRestart
@@ -196,7 +197,7 @@ body
 #welcomeScore
 {
 	font-size:16px;
-	margin-top:20px;	
+	margin-top:10px;	
 }
 
 #minigame
