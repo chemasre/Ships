@@ -57,6 +57,7 @@ body
     height:175px;
     image-rendering: crisp-edges;
 	position:absolute;
+    z-index:0;
 }
 
 #vignette
@@ -78,6 +79,7 @@ body
     left:0px;
     top:316px;
     bottom:0px;
+    z-index:-1;
 }
 
 #seaForeground
@@ -90,6 +92,7 @@ body
     left:0px;
     top:327px;
     bottom:0px;
+    z-index:0;
 }
 
 #ship
@@ -103,6 +106,8 @@ body
 	height:68px;
     
 	transition: rotate 0.15s ease-in-out;    
+    transition: filter 0.15s ease-in-out;  
+    transition: transform 0.15s ease-in-out;
 }
 
 .stick
@@ -120,6 +125,7 @@ body
 	display:block;
 	position:absolute;
     bottom:0px;
+    z-index: -3;
 }
 
 /*

@@ -14,6 +14,9 @@
     var minigameLevelDuration = 10;
     var minigameNumLevels = 3;
 	var minigameLevelMessages = ["", "no compass can help me", "oh yes! they float, Georgie"];
+    var minigameLevelModeJump = 0;
+    var minigameLevelModeBackground = 1;
+    var minigameLevelModes = [minigameLevelModeJump, minigameLevelModeBackground, minigameLevelModeJump];
     var minigameLevelChanging;
     
     var minigameLevelTimer;
@@ -99,6 +102,12 @@
     var shipSpeedY = 0;
     var shipGravity = 2000.0;
     
+    var shipInForeground;
+    var shipForegroundFilter = "sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg)";
+    var shipForegroundTransform = "translate(0%, 0%)";
+    var shipBackgroundFilter = "sepia(10%) saturate(30%) brightness(40%) hue-rotate(50deg)";
+    var shipBackgroundTransform = "translate(10%, 10%) scale(80%)";
+    
     var shipPosX;
     var shipPosY;
     var shipWidth = 147;
@@ -129,7 +138,13 @@
     
     var stickPositionsX;
     var stickPositionsY;
-    
+
+    var stickInForeground;    
+    var stickForegroundFilter = "sepia(0%) saturate(100%) brightness(100%) hue-rotate(0deg)";
+    var stickForegroundTransform = "translate(0%, 0%)";
+    var stickBackgroundFilter = "sepia(10%) saturate(30%) brightness(80%) hue-rotate(50deg)";
+    var stickBackgroundTransform = "translate(5%, 5%) scale(98%)";
+
     var stickLastSpawnGroupChanceX;
     var stickSpawnGroupMissedChances;
     
@@ -155,6 +170,7 @@
         sticks = new Array();
         stickPositionsX = new Array();
         stickPositionsY = new Array();
+        stickInForeground = new Array();
         
         for(var i = 0; i < numSticks; i++)
         {
@@ -162,6 +178,7 @@
            
             stickPositionsX.push(0);
             stickPositionsY.push(0);
+            stickInForeground.push(true);
             
             sticks[i].style.display = "none";
         }
@@ -238,6 +255,8 @@
         shipJumping = false;
         shipSpeedY = 0;
         ship.style.rotate = "0deg"; 
+        
+        MinigameSetShipInForeground(true);
 
         shipDead = false;
 
@@ -260,6 +279,12 @@
         sticks[0].style.display = "block";
         if(minigameSwitchNoSticks) { sticks[0].style.display = "none"; }
         stickPositionsX[0] = sceneWidth;
+        stickPositionsY[0] = stickTopPosY[minigameLevel];
+        stickInForeground[0] = true;
+        sticks[0].style.filter = stickForegroundFilter;
+        sticks[0].style.transform = stickForegroundTransform;
+        sticks[0].style.zIndex = 0;        
+        
         stickLastSpawnGroupChanceX = sceneWidth;
         stickSpawnGroupMissedChances = 0;
     
@@ -292,6 +317,25 @@
 			console.log("Stored: " + minigamePoints.toString());
 			
 		}
+    }
+    
+    function MinigameSetShipInForeground(value)
+    {
+        if(value)
+        {
+            ship.style.filter = shipForegroundFilter;
+            ship.style.transform = shipForegroundTransform;
+            ship.style.zIndex = 0;
+        }
+        else
+        {
+            ship.style.filter = shipBackgroundFilter;
+            ship.style.transform = shipBackgroundTransform;
+            ship.style.zIndex = -1;            
+        }
+        
+        shipInForeground = value;
+        
     }
 	    
     function MinigameFindRandomSpawnable(array)
@@ -434,13 +478,27 @@
         
         // Update ship
         
-        if(inputJumpWasPressed && !shipJumping && !shipDead)
+        var isJumpMode = (minigameLevelModes[minigameLevel] == minigameLevelModeJump);
+        var isBackgroundMode = (minigameLevelModes[minigameLevel] == minigameLevelModeBackground);
+        
+        if(inputJumpWasPressed && isJumpMode && !shipJumping && !shipDead)
         {
             shipSpeedY = shipJumpSpeed;
             shipJumping = true;
             soundJump.play();
             ship.style.rotate = "-10deg";        
         }    
+        
+        if(inputJumpWasPressed && isBackgroundMode && !shipDead)
+        {
+            if(shipInForeground) { MinigameSetShipInForeground(false); }
+            else { MinigameSetShipInForeground(true); }
+        }
+        
+        if(!shipInForeground && !isBackgroundMode) 
+        {
+            MinigameSetShipInForeground(true);
+        }
 
         if(shipJumping)
         {
@@ -473,7 +531,7 @@
 				if(sticks[i].style.display != "none")
 				{
 					if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
-						shipPosY + shipHeight >= stickPositionsY[i])
+						shipPosY + shipHeight >= stickPositionsY[i] && shipInForeground == stickInForeground[i])
 					{
 						shipDead = true;
 						if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
@@ -501,9 +559,11 @@
             {
                 if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
                 {
+                    var spawnInForeground = isBackgroundMode ? (MinigameRandomRangeInt(0, 2) == 0) : true;
+                    
                     sticks[spawnableIndex].style.display = "block";
 					if(minigameSwitchNoSticks) { sticks[spawnableIndex].style.display = "none"; }
-                    
+
                     var groupMembers = Math.floor((Math.random() * 1000)) % stickSpawnGroupMaxMembers[minigameLevel];
                     
                     //console.log("Spawned group with " + (groupMembers + 1) + " members");
@@ -515,6 +575,10 @@
                         {
                             stickPositionsX[groupMemberIndex] = sceneWidth + stickSpawnGroupMemberSeparation[minigameLevel] * (i + 1);
                             stickPositionsY[groupMemberIndex] = stickTopPosY[minigameLevel];   
+                            stickInForeground[groupMemberIndex] = spawnInForeground;
+                            sticks[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+                            sticks[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+                            sticks[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
                             sticks[groupMemberIndex].style.display = "block";
 							if(minigameSwitchNoSticks) { sticks[groupMemberIndex].style.display = "none"; }
                         }
@@ -530,6 +594,10 @@
                 }
                 stickPositionsX[spawnableIndex] = sceneWidth;
                 stickPositionsY[spawnableIndex] = stickTopPosY[minigameLevel];
+                stickInForeground[spawnableIndex] = spawnInForeground;
+                sticks[spawnableIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+                sticks[spawnableIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+                sticks[spawnableIndex].style.zIndex = spawnInForeground ? 0 : -1;
                 stickLastSpawnGroupChanceX = sceneWidth;
             }
         
