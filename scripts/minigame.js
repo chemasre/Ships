@@ -75,8 +75,8 @@
     var parallaxNumObjects = [3, 2];
     var parallaxNumPlanes = 2;
     
-    var parallaxMinSeparation = [600, 1200];
-    var parallaxMaxSeparation = [1200, 5000];
+    var parallaxMinSeparation = [600, 700];
+    var parallaxMaxSeparation = [1200, 1500];
     var parallaxSeparation = [0, 0];
     
     var parallaxSpeedFactor = [0.2, 0.05];
@@ -207,7 +207,7 @@
         
         for(var i = 0; i < parallaxNumPlanes; i++)
         {
-            parallaxLastSpawnX[i] = sceneWidth;
+            parallaxLastSpawnX[i] = 0;
 
             parallaxSeparation[i] = parallaxMinSeparation[i] + (parallaxMaxSeparation[i] - parallaxMinSeparation[i]) * Math.random();
             
@@ -375,10 +375,10 @@
         
         for(var i = 0; i < parallaxNumPlanes; i++)
         {
-            parallaxLastSpawnX[i] += sceneSpeedX * minigameTimeStep;
+            parallaxLastSpawnX[i] += sceneSpeedX * parallaxSpeedFactor[i] * minigameTimeStep;
             
-            if(parallaxLastSpawnX[i] < -parallaxSeparation[i])
-            {
+            if(sceneWidth - parallaxLastSpawnX[i] > parallaxSeparation[i])
+            {				
                 var index = MinigameFindSpawnable(parallaxObjects[i]);
                 
                 if(index >= 0)
@@ -483,7 +483,7 @@
                     
                     var groupMembers = Math.floor((Math.random() * 1000)) % stickSpawnGroupMaxMembers[minigameLevel];
                     
-                    console.log("Spawned group with " + (groupMembers + 1) + " members");
+                    //console.log("Spawned group with " + (groupMembers + 1) + " members");
                     
                     for(var i = 0; i < groupMembers; i++)
                     {
