@@ -99,6 +99,7 @@
     
     var shipJumping;
     var shipJumpSpeed = -650;
+    var shipJumpBackgroundSpeed = -250;
     var shipSpeedY = 0;
     var shipGravity = 2000.0;
     
@@ -478,22 +479,18 @@
         
         // Update ship
         
-        var isJumpMode = (minigameLevelModes[minigameLevel] == minigameLevelModeJump);
         var isBackgroundMode = (minigameLevelModes[minigameLevel] == minigameLevelModeBackground);
         
-        if(inputJumpWasPressed && isJumpMode && !shipJumping && !shipDead)
+        if(inputJumpWasPressed && !shipJumping && !shipDead)
         {
-            shipSpeedY = shipJumpSpeed;
+            shipSpeedY = !isBackgroundMode ? shipJumpSpeed : shipJumpBackgroundSpeed;
             shipJumping = true;
             soundJump.play();
-            ship.style.rotate = "-10deg";        
-        }    
-        
-        if(inputJumpWasPressed && isBackgroundMode && !shipDead)
-        {
+            ship.style.rotate = "-10deg";  
+
             if(shipInForeground) { MinigameSetShipInForeground(false); }
             else { MinigameSetShipInForeground(true); }
-        }
+        }    
         
         if(!shipInForeground && !isBackgroundMode) 
         {
