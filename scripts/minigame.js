@@ -58,10 +58,12 @@
     // Sound
     
     var soundIsPlaying;
-    var soundBackgroundMusicVolume = 0.5;
-    var soundBackgroundMusic;
+    var soundAmbientMusicVolume = 0.3;
+    var soundAmbientMusic;
     var soundJumpVolume = 0.15;
-    var soundJump;
+    var soundJump;    
+    var soundAmbientVolume = 1;
+    var soundAmbient;
     
     // Scene
     
@@ -762,7 +764,8 @@
             
             if(!soundIsPlaying)
             {
-                soundBackgroundMusic.play();
+                soundAmbientMusic.play();
+                soundAmbient.play();
                 soundIsPlaying = true;
             }
 
@@ -855,11 +858,19 @@
 		
 		if(minigameSwitchNoSound) { soundJump.volume = 0; }
 
-        soundBackgroundMusic = document.getElementById("backgroundMusic");
-        soundBackgroundMusic.volume = soundBackgroundMusicVolume;
-        soundBackgroundMusic.loop = true;
+        soundAmbientMusic = document.getElementById("ambientMusic");
+        soundAmbientMusic.volume = soundAmbientMusicVolume;
+        soundAmbientMusic.loop = true;
 
-		if(minigameSwitchNoSound) { soundBackgroundMusic.volume = 0; }
+        soundAmbient = document.getElementById("ambientSound");
+        soundAmbient.volume = soundAmbientVolume;
+        soundAmbient.loop = true;
+
+		if(minigameSwitchNoSound)
+        {
+            soundAmbientMusic.volume = 0;
+            soundAmbient.volume = 0;
+        }
 
         soundIsPlaying = false;
         
