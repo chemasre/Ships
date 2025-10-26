@@ -12,11 +12,11 @@
     
     var minigameLevel = 0;
     var minigameLevelDuration = 10;
-    var minigameNumLevels = 3;
-	var minigameLevelMessages = ["", "no compass can help me", "oh yes! they float, Georgie"];
+    var minigameNumLevels = 4;
+	var minigameLevelMessages = ["", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
     var minigameLevelModeJump = 0;
     var minigameLevelModeBackground = 1;
-    var minigameLevelModes = [minigameLevelModeJump, minigameLevelModeBackground, minigameLevelModeJump];
+    var minigameLevelModes = [minigameLevelModeJump, minigameLevelModeBackground, minigameLevelModeJump, minigameLevelModeBackground];
     var minigameLevelChanging;
     
     var minigameLevelTimer;
@@ -65,7 +65,7 @@
     
     // Scene
     
-    var sceneLevelSpeedX = [-400, -500, -700];
+    var sceneLevelSpeedX = [-400, -500, -700, -700];
     var sceneTargetSpeedX;
     var sceneAccelerationX = 200;
     var sceneSpeedX;
@@ -124,13 +124,13 @@
     
     var stickKillDistance = 1200;
     
-    var stickSpawnGroupSeparation = [300, 400, 500];
-    var stickSpawnGroupChances = [2, 3, 4];
+    var stickSpawnGroupSeparation = [300, 400, 500, 500];
+    var stickSpawnGroupChances = [2, 3, 4, 4];
     var stickSpawnGroupMaxMissedChances = 3;
-    var stickSpawnGroupMaxMembers = [2, 3, 4];
-    var stickSpawnGroupMemberSeparation = [80, 80, 80];
+    var stickSpawnGroupMaxMembers = [2, 3, 4, 4];
+    var stickSpawnGroupMemberSeparation = [80, 80, 80, 80];
     
-    var stickTopPosY = [290, 280, 270];
+    var stickTopPosY = [290, 280, 270, 270];
 
     var sticks;
     var numSticks = 20;
@@ -148,6 +148,18 @@
 
     var stickLastSpawnGroupChanceX;
     var stickSpawnGroupMissedChances;
+    
+    var waves;
+    var numWaves = 2;
+    var numWaveFrames = 3;
+    var waveTimers;
+    var waveFrameIntervalMin = 0.2;
+    var waveFrameIntervalMax = 0.2;
+    var waveMainFrameOpacity = 1.0;
+    var waveOtherFrameOpacity = 0;    
+    var waveFrames;
+    var wavesPositionX = -300;
+    var waveSeparation = 700;
     
     var ship;
     
@@ -201,6 +213,20 @@
                 parallaxObjects[i][j].style.display = "none";
                 parallaxObjectsX[i][j] = 0;
 				parallaxObjectsSpeedFactor[i][j] = 0;
+            }
+        }
+        
+        waves = new Array();
+        waveTimers = new Array();
+        waveFrames = new Array();
+        for(var i = 0; i < numWaves; i++)
+        {
+            waves.push(new Array());
+            for(var j = 0; j < numWaveFrames; j++)
+            {
+                waves[i].push(document.getElementById("wave" + (i + 1) + "" + (j + 1)));
+                
+                waves[i][j].style.display = "none";
             }
         }
         
@@ -288,6 +314,32 @@
         
         stickLastSpawnGroupChanceX = sceneWidth;
         stickSpawnGroupMissedChances = 0;
+        
+        // Init waves
+
+        for(var i = 0; i < numWaves; i++)
+        {
+            waves.push(new Array());
+            for(var j = 0; j < numWaveFrames; j++)
+            {
+                waves[i][j].style.display = "block";
+            }
+
+            waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+            waveFrames[i] = MinigameRandomRangeInt(0, numWaveFrames);
+            
+            for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+            {
+                waves[i][frameIndex].style.display = "block";
+                waves[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
+                waves[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
+                waves[i][frameIndex].style.transform = "scale(0%)";
+            }
+            
+
+        }
+        
+        
     
     }
     
@@ -624,6 +676,28 @@
                     sticks[i].style.top = stickPositionsY[i] + "px";
                 }
             }
+        }
+        
+        // Update waves
+        
+        for(var i = 0; i < numWaves; i++)
+        {
+            waveTimers[i] -= minigameTimeStep;
+            if(waveTimers[i] < 0)
+            {
+                waveFrames[i]++;
+                if(waveFrames[i] >= numWaveFrames) { waveFrames[i] = 0; }
+                
+                for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+                {
+                    waves[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);
+                    waves[i][frameIndex].style.transform = "scale(70%)";
+                    
+                }
+
+                waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+            }
+            
         }
     
     }    
