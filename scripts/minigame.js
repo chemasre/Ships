@@ -10,19 +10,29 @@
 	var minigameRecordPoints;
 	var minigameRecordExists;
     
-    var minigameLevel = 0;
-    var minigameLevelDuration = 10;
-    var minigameNumLevels = 4;
-	var minigameLevelMessages = ["", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
-    var minigameLevelModeJump = 0;
-    var minigameLevelModeBackground = 1;
-    var minigameLevelModes = [minigameLevelModeJump, minigameLevelModeBackground, minigameLevelModeJump, minigameLevelModeBackground];
-    var minigameLevelChanging;
+    var level = 0;
+    var levelCount = 5;
+	var levelMessages = ["", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
     
-    var minigameLevelTimer;
+    var levelDuration                        = [   10  ,   10  ,   10  ,   10  ];
+    var levelSpeedX                          = [ -400  , -500  , -700  , -700  ];
+    var levelStickSpawnGroupSeparation       = [  300  ,  400  ,  500  ,  500  ];
+    var levelStickSpawnGroupChances          = [    2  ,    3  ,    4  ,    4  ];
+    var levelStickSpawnGroupMaxMembers       = [    2  ,    3  ,    4  ,    4  ];
+    var levelStickSpawnGroupMemberSeparation = [   80  ,   80  ,   80  ,   80  ];    
+    var levelStickTopPosY                    = [  290  ,  280  ,  270  ,  270  ];    
     
-    var points;
-    var message;
+    var levelModeJump = 0;
+    var levelModeBackground = 1;
+    var levelModeWaves = 2;
+    
+    var levelModes = [levelModeJump, levelModeBackground, levelModeJump, levelModeBackground];
+    var levelChanging;
+    
+    var levelTimer;
+    
+    var pointsElement;
+    var messageElement;
     
     var minigameState;
     var minigameStateWelcome    = 0;
@@ -33,7 +43,7 @@
 	var minigameSwitchNoSound = false;
     
     // Menus
-    var gameOver;
+    var gameOverElement;
     var gameOverScore;
     var gameOverRestart;
 	var gameOverRestartBlinkOn;
@@ -42,7 +52,7 @@
     var gameOverRestartTimer;
     var gameOverRestartDelay = 0.5;
     
-    var welcome;
+    var welcomeElement;
 	var welcomeScore;
 	var welcomeStart;
 	var welcomeStartBlinkOn;
@@ -59,15 +69,14 @@
     
     var soundIsPlaying;
     var soundAmbientMusicVolume = 0.3;
-    var soundAmbientMusic;
+    var soundAmbientMusicElement;
     var soundJumpVolume = 0.15;
-    var soundJump;    
+    var soundJumpElement;    
     var soundAmbientVolume = 1;
-    var soundAmbient;
+    var soundAmbientElement;
     
     // Scene
     
-    var sceneLevelSpeedX = [-400, -500, -700, -700];
     var sceneTargetSpeedX;
     var sceneAccelerationX = 200;
     var sceneSpeedX;
@@ -77,7 +86,7 @@
     
     // Parallax
     
-    var parallaxObjects;
+    var parallaxObjectElements;
     var parallaxObjectsX;
     var parallaxObjectsSpeedFactor;
 	var parallaxObjectsSpeedFactorMin = 0.5;
@@ -120,21 +129,15 @@
     var shipDead;
     var shipSinkSpeed = 100;
     
-    var ship;
+    var shipElement;
     
     // Sticks
     
     var stickKillDistance = 1200;
     
-    var stickSpawnGroupSeparation = [300, 400, 500, 500];
-    var stickSpawnGroupChances = [2, 3, 4, 4];
     var stickSpawnGroupMaxMissedChances = 3;
-    var stickSpawnGroupMaxMembers = [2, 3, 4, 4];
-    var stickSpawnGroupMemberSeparation = [80, 80, 80, 80];
-    
-    var stickTopPosY = [290, 280, 270, 270];
 
-    var sticks;
+    var stickElements;
     var numSticks = 20;
     var stickWidth = 51;
     var stickHeight = 155;
@@ -151,7 +154,9 @@
     var stickLastSpawnGroupChanceX;
     var stickSpawnGroupMissedChances;
     
-    var waves;
+    // Waves
+    
+    var waveElements;
     var numWaves = 2;
     var numWaveFrames = 3;
     var waveTimers;
@@ -163,7 +168,7 @@
     var wavesPositionX = -300;
     var waveSeparation = 700;
     
-    var ship;
+    var shipElement;
     
     ////////////////////////////////////////////////////////////////////////////////
     ////////////////////////// PLAY STATE //////////////////////////////////////////
@@ -177,63 +182,63 @@
 		if(storedRecord != null) { minigameRecordPoints = parseInt(storedRecord); minigameRecordExists = true; }
 		else { minigameRecordPoints = 0; minigameRecordExists = false; }
 		
-        points = document.getElementById("points");
-        message = document.getElementById("message");
-        ship = document.getElementById("ship");
+        pointsElement = document.getElementById("points");
+        messageElement = document.getElementById("message");
+        shipElement = document.getElementById("ship");
         
 
-        sticks = new Array();
+        stickElements = new Array();
         stickPositionsX = new Array();
         stickPositionsY = new Array();
         stickInForeground = new Array();
         
         for(var i = 0; i < numSticks; i++)
         {
-            sticks.push(document.getElementById("stick" + (i + 1)));            
+            stickElements.push(document.getElementById("stick" + (i + 1)));            
            
             stickPositionsX.push(0);
             stickPositionsY.push(0);
             stickInForeground.push(true);
             
-            sticks[i].style.display = "none";
+            stickElements[i].style.display = "none";
         }
         
-        parallaxObjects = new Array();
+        parallaxObjectElements = new Array();
         parallaxObjectsX = new Array();
         parallaxObjectsSpeedFactor = new Array();
         
         for(var i = 0; i < parallaxNumPlanes; i++)
         {
-            parallaxObjects.push(new Array());
+            parallaxObjectElements.push(new Array());
             parallaxObjectsX.push(new Array());
             parallaxObjectsSpeedFactor.push(new Array());
             
             for(var j = 0; j < parallaxNumObjects[i]; j++)
             {
-                parallaxObjects[i].push(document.getElementById("parallax" + (i + 1) + "Object" + (j + 1)));
+                parallaxObjectElements[i].push(document.getElementById("parallax" + (i + 1) + "Object" + (j + 1)));
                 
-                parallaxObjects[i][j].style.display = "none";
+                parallaxObjectElements[i][j].style.display = "none";
                 parallaxObjectsX[i][j] = 0;
 				parallaxObjectsSpeedFactor[i][j] = 0;
             }
         }
         
-        waves = new Array();
+        waveElements = new Array();
         waveTimers = new Array();
         waveFrames = new Array();
         for(var i = 0; i < numWaves; i++)
         {
-            waves.push(new Array());
+            waveElements.push(new Array());
             for(var j = 0; j < numWaveFrames; j++)
             {
-                waves[i].push(document.getElementById("wave" + (i + 1) + "" + (j + 1)));
+                waveElements[i].push(document.getElementById("wave" + (i + 1) + "" + (j + 1)));
                 
-                waves[i][j].style.display = "none";
+                waveElements[i][j].style.display = "none";
             }
         }
         
-        points.style.opacity = 0;            
-        message.style.opacity = 0;            
+        pointsElement.style.opacity = 0;            
+        messageElement.style.opacity = 0;            
             
     }
     
@@ -241,20 +246,20 @@
     {
         // Init minigame
         
-        minigameLevel = 0;
-        minigameLevelTimer = minigameLevelDuration;
-        minigameLevelChanging = false;
+        level = 0;
+        levelTimer = levelDuration[0];
+        levelChanging = false;
     
         minigamePoints = 0;
-        points.innerHTML = 0;        
-        points.style.opacity = 1;
+        pointsElement.innerHTML = 0;        
+        pointsElement.style.opacity = 1;
 		
-		message.style.opacity = 0;
+		messageElement.style.opacity = 0;
         
         // Init scene 
         
         sceneSpeedX = 0;
-        sceneTargetSpeedX = sceneLevelSpeedX[0];        
+        sceneTargetSpeedX = levelSpeedX[0];        
         
         // Init parallax
         
@@ -267,23 +272,23 @@
             
             for(var j = 0; j < parallaxNumObjects[i]; j++)
             {
-                parallaxObjects[i][j].style.display = "none";
+                parallaxObjectElements[i][j].style.display = "none";
             }
         }
 
         // Init ship
         
-        ship.style.display = "block";
+        shipElement.style.display = "block";
         
         shipPosX = shipStartPosX;
         shipPosY = shipStartPosY;
         
-        ship.style.left = shipPosX + "px";
-        ship.style.top = shipPosY + "px";
+        shipElement.style.left = shipPosX + "px";
+        shipElement.style.top = shipPosY + "px";
         
         shipJumping = false;
         shipSpeedY = 0;
-        ship.style.rotate = "0deg"; 
+        shipElement.style.rotate = "0deg"; 
         
         MinigameSetShipInForeground(true);
 
@@ -293,26 +298,26 @@
         
         for(var i = 0; i < numSticks; i++)
         {
-            sticks.push(document.getElementById("stick" + (i + 1)));            
+            stickElements.push(document.getElementById("stick" + (i + 1)));            
            
             stickPositionsX[i] = sceneWidth;
-            stickPositionsY[i] = stickTopPosY[minigameLevel];
+            stickPositionsY[i] = levelStickTopPosY[level];
             
-            sticks[i].style.left = stickPositionsX[i] + "px";
-            sticks[i].style.top = stickPositionsY[i] + "px";
+            stickElements[i].style.left = stickPositionsX[i] + "px";
+            stickElements[i].style.top = stickPositionsY[i] + "px";
             
-            sticks[i].style.display = "none";
+            stickElements[i].style.display = "none";
             
         }
         
-        sticks[0].style.display = "block";
-        if(minigameSwitchNoSticks) { sticks[0].style.display = "none"; }
+        stickElements[0].style.display = "block";
+        if(minigameSwitchNoSticks) { stickElements[0].style.display = "none"; }
         stickPositionsX[0] = sceneWidth;
-        stickPositionsY[0] = stickTopPosY[minigameLevel];
+        stickPositionsY[0] = levelStickTopPosY[level];
         stickInForeground[0] = true;
-        sticks[0].style.filter = stickForegroundFilter;
-        sticks[0].style.transform = stickForegroundTransform;
-        sticks[0].style.zIndex = 0;        
+        stickElements[0].style.filter = stickForegroundFilter;
+        stickElements[0].style.transform = stickForegroundTransform;
+        stickElements[0].style.zIndex = 0;        
         
         stickLastSpawnGroupChanceX = sceneWidth;
         stickSpawnGroupMissedChances = 0;
@@ -321,10 +326,10 @@
 
         for(var i = 0; i < numWaves; i++)
         {
-            waves.push(new Array());
+            waveElements.push(new Array());
             for(var j = 0; j < numWaveFrames; j++)
             {
-                waves[i][j].style.display = "block";
+                waveElements[i][j].style.display = "block";
             }
 
             waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
@@ -332,10 +337,10 @@
             
             for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
             {
-                waves[i][frameIndex].style.display = "block";
-                waves[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
-                waves[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
-                waves[i][frameIndex].style.transform = "scale(0%)";
+                waveElements[i][frameIndex].style.display = "block";
+                waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
+                waveElements[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
+                waveElements[i][frameIndex].style.transform = "scale(0%)";
             }
             
 
@@ -347,10 +352,10 @@
     
     function MinigameExitPlay()
     {
-        ship.style.display = "none";
-        ship.style.rotate = "0deg";
+        shipElement.style.display = "none";
+        shipElement.style.rotate = "0deg";
         
-        points.style.opacity = 0;
+        pointsElement.style.opacity = 0;
 		
 		var storeRecord = false;
         
@@ -378,15 +383,15 @@
     {
         if(value)
         {
-            ship.style.filter = shipForegroundFilter;
-            ship.style.transform = shipForegroundTransform;
-            ship.style.zIndex = 0;
+            shipElement.style.filter = shipForegroundFilter;
+            shipElement.style.transform = shipForegroundTransform;
+            shipElement.style.zIndex = 0;
         }
         else
         {
-            ship.style.filter = shipBackgroundFilter;
-            ship.style.transform = shipBackgroundTransform;
-            ship.style.zIndex = -1;            
+            shipElement.style.filter = shipBackgroundFilter;
+            shipElement.style.transform = shipBackgroundTransform;
+            shipElement.style.zIndex = -1;            
         }
         
         shipInForeground = value;
@@ -395,10 +400,10 @@
 	    
     function MinigameFindRandomSpawnable(array)
     {
-		return MinigameFindSpawnableFrom(array, MinigameRandomRangeInt(0, array.length));
+		return MinigameFindSpawnableElementFrom(array, MinigameRandomRangeInt(0, array.length));
     }
 
-    function MinigameFindSpawnableFrom(array, fromIndex)
+    function MinigameFindSpawnableElementFrom(array, fromIndex)
     {
         var found = false;
         var i = 0;
@@ -421,9 +426,9 @@
         return result;
     }
 
-    function MinigameFindSpawnable(array)
+    function MinigameFindSpawnableElement(array)
     {
-        return MinigameFindSpawnableFrom(array, 0);
+        return MinigameFindSpawnableElementFrom(array, 0);
     }
 
     function MinigameUpdatePlay()
@@ -432,19 +437,19 @@
         
         if(shipDead)
         {
-            message.style.opacity = 0;
-            minigameLevelChanging = false;
+            messageElement.style.opacity = 0;
+            levelChanging = false;
         }
-        else if(minigameLevel < minigameNumLevels - 1)
+        else if(level < levelCount - 1)
         {
-            if(!minigameLevelChanging)
+            if(!levelChanging)
             {
-                minigameLevelTimer -= minigameTimeStep;
-                if(minigameLevelTimer < 0)
+                levelTimer -= minigameTimeStep;
+                if(levelTimer < 0)
                 {
-                    minigameLevelChanging = true;
-					message.style.opacity = 1;
-					message.innerHTML = "<div style='font-size:30px'>" + minigameLevelMessages[minigameLevel + 1] + "</div>"
+                    levelChanging = true;
+					messageElement.style.opacity = 1;
+					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
                     console.log("Changing level");
                 }
 
@@ -453,11 +458,11 @@
             {
                 if(stickLastSpawnGroupChanceX < -stickWidth)
                 {
-					message.style.opacity = 0;
-                    minigameLevelChanging = false;
-                    minigameLevelTimer = minigameLevelDuration;
-                    sceneTargetSpeedX = sceneLevelSpeedX[minigameLevel + 1];
-                    minigameLevel ++;
+					messageElement.style.opacity = 0;
+                    levelChanging = false;
+                    levelTimer = levelDuration[level + 1];
+                    sceneTargetSpeedX = levelSpeedX[level + 1];
+                    level ++;
                     
                     
                     console.log("Increased level");
@@ -474,7 +479,7 @@
             minigamePoints += minigamePointsPerDistance *
                               Math.abs(sceneSpeedX) * minigameTimeStep;
                               
-            points.innerHTML = Math.floor(minigamePoints / 10) * 10;
+            pointsElement.innerHTML = Math.floor(minigamePoints / 10) * 10;
         }
         
         // Update scene
@@ -499,7 +504,7 @@
             
             if(sceneWidth - parallaxLastSpawnX[i] > parallaxSeparation[i])
             {				
-                var index = MinigameFindRandomSpawnable(parallaxObjects[i]);
+                var index = MinigameFindRandomSpawnable(parallaxObjectElements[i]);
                 
                 if(index >= 0)
                 {
@@ -507,7 +512,7 @@
                     
                     parallaxObjectsX[i][index] = sceneWidth;
 					parallaxObjectsSpeedFactor[i][index] = MinigameRandomRange(parallaxObjectsSpeedFactorMin, parallaxObjectsSpeedFactorMax);
-                    parallaxObjects[i][index].style.display = "block";
+                    parallaxObjectElements[i][index].style.display = "block";
                     
                     parallaxLastSpawnX[i] = sceneWidth;
                     
@@ -519,13 +524,13 @@
             
             for(var j = 0; j < parallaxNumObjects[i]; j++)
             {
-                if(parallaxObjects[i][j].style.display != "none")
+                if(parallaxObjectElements[i][j].style.display != "none")
                 {
                     parallaxObjectsX[i][j] += sceneSpeedX * parallaxSpeedFactor[i] * parallaxObjectsSpeedFactor[i][j] * minigameTimeStep;
                     
-                    if(parallaxObjectsX[i][j] < -900) { parallaxObjects[i][j].style.display = "none"; }
+                    if(parallaxObjectsX[i][j] < -900) { parallaxObjectElements[i][j].style.display = "none"; }
                     
-                    parallaxObjects[i][j].style.left = parallaxObjectsX[i][j] + "px";
+                    parallaxObjectElements[i][j].style.left = parallaxObjectsX[i][j] + "px";
                 }
             }
         }
@@ -533,14 +538,14 @@
         
         // Update ship
         
-        var isBackgroundMode = (minigameLevelModes[minigameLevel] == minigameLevelModeBackground);
+        var isBackgroundMode = (levelModes[level] == levelModeBackground);
         
         if(inputJumpWasPressed && !shipJumping && !shipDead)
         {
             shipSpeedY = !isBackgroundMode ? shipJumpSpeed : shipJumpBackgroundSpeed;
             shipJumping = true;
-            soundJump.play();
-            ship.style.rotate = "-10deg";  
+            soundJumpElement.play();
+            shipElement.style.rotate = "-10deg";  
 
             if(shipInForeground) { MinigameSetShipInForeground(false); }
             else { MinigameSetShipInForeground(true); }
@@ -563,7 +568,7 @@
 
                 shipJumping = false;
 
-                ship.style.rotate = "0deg";        
+                shipElement.style.rotate = "0deg";        
             }
         }
         else if(shipDead)
@@ -571,7 +576,7 @@
 			if(shipPosY < sceneHeight)
 			{
 				shipPosY += shipSinkSpeed * minigameTimeStep;
-				ship.style.rotate = "70deg";
+				shipElement.style.rotate = "70deg";
 			}
         }
         
@@ -579,7 +584,7 @@
 		{
 			for(var i = 0; i < numSticks; i++)
 			{
-				if(sticks[i].style.display != "none")
+				if(stickElements[i].style.display != "none")
 				{
 					if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
 						shipPosY + shipHeight >= stickPositionsY[i] && shipInForeground == stickInForeground[i])
@@ -595,16 +600,16 @@
 			}
 		}
         
-        ship.style.left = shipPosX + "px";
-        ship.style.top = shipPosY + "px";    
+        shipElement.style.left = shipPosX + "px";
+        shipElement.style.top = shipPosY + "px";    
 
         // Update sticks
 
-        var spawnGroupChance = Math.floor((Math.random() * 1000)) % stickSpawnGroupChances[minigameLevel];
+        var spawnGroupChance = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupChances[level];
 
-        if(sceneWidth - stickLastSpawnGroupChanceX > stickSpawnGroupSeparation[minigameLevel] && !minigameLevelChanging)
+        if(sceneWidth - stickLastSpawnGroupChanceX > levelStickSpawnGroupSeparation[level] && !levelChanging)
         {
-            var spawnableIndex = MinigameFindSpawnable(sticks);
+            var spawnableIndex = MinigameFindSpawnableElement(stickElements);
             
             if(spawnableIndex >= 0)
             {
@@ -612,26 +617,26 @@
                 {
                     var spawnInForeground = isBackgroundMode ? (MinigameRandomRangeInt(0, 2) == 0) : true;
                     
-                    sticks[spawnableIndex].style.display = "block";
-					if(minigameSwitchNoSticks) { sticks[spawnableIndex].style.display = "none"; }
+                    stickElements[spawnableIndex].style.display = "block";
+					if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
 
-                    var groupMembers = Math.floor((Math.random() * 1000)) % stickSpawnGroupMaxMembers[minigameLevel];
+                    var groupMembers = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupMaxMembers[level];
                     
                     //console.log("Spawned group with " + (groupMembers + 1) + " members");
                     
                     for(var i = 0; i < groupMembers; i++)
                     {
-                        var groupMemberIndex = MinigameFindSpawnable(sticks);
+                        var groupMemberIndex = MinigameFindSpawnableElement(stickElements);
                         if(groupMemberIndex >= 0)
                         {
-                            stickPositionsX[groupMemberIndex] = sceneWidth + stickSpawnGroupMemberSeparation[minigameLevel] * (i + 1);
-                            stickPositionsY[groupMemberIndex] = stickTopPosY[minigameLevel];   
+                            stickPositionsX[groupMemberIndex] = sceneWidth + levelStickSpawnGroupMemberSeparation[level] * (i + 1);
+                            stickPositionsY[groupMemberIndex] = levelStickTopPosY[level];   
                             stickInForeground[groupMemberIndex] = spawnInForeground;
-                            sticks[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
-                            sticks[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
-                            sticks[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
-                            sticks[groupMemberIndex].style.display = "block";
-							if(minigameSwitchNoSticks) { sticks[groupMemberIndex].style.display = "none"; }
+                            stickElements[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+                            stickElements[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+                            stickElements[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
+                            stickElements[groupMemberIndex].style.display = "block";
+							if(minigameSwitchNoSticks) { stickElements[groupMemberIndex].style.display = "none"; }
                         }
                     }
                     
@@ -639,16 +644,16 @@
                 }
                 else
                 {
-                    sticks[spawnableIndex].style.display = "none";
+                    stickElements[spawnableIndex].style.display = "none";
                     
                     stickSpawnGroupMissedChances ++;
                 }
                 stickPositionsX[spawnableIndex] = sceneWidth;
-                stickPositionsY[spawnableIndex] = stickTopPosY[minigameLevel];
+                stickPositionsY[spawnableIndex] = levelStickTopPosY[level];
                 stickInForeground[spawnableIndex] = spawnInForeground;
-                sticks[spawnableIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
-                sticks[spawnableIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
-                sticks[spawnableIndex].style.zIndex = spawnInForeground ? 0 : -1;
+                stickElements[spawnableIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+                stickElements[spawnableIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+                stickElements[spawnableIndex].style.zIndex = spawnInForeground ? 0 : -1;
                 stickLastSpawnGroupChanceX = sceneWidth;
             }
         
@@ -658,7 +663,7 @@
         
         for(var i = 0; i < numSticks; i++)
         {
-            if(sticks[i].style.display != "none")
+            if(stickElements[i].style.display != "none")
             {
                 var behindShipBefore = (stickPositionsX[i] < shipPosX);
             
@@ -670,12 +675,12 @@
 
                 if(stickPositionsX[i] <= -stickKillDistance)
                 {
-                    sticks[i].style.display = "none";
+                    stickElements[i].style.display = "none";
                 }
                 else
                 {
-                    sticks[i].style.left = stickPositionsX[i] + "px";
-                    sticks[i].style.top = stickPositionsY[i] + "px";
+                    stickElements[i].style.left = stickPositionsX[i] + "px";
+                    stickElements[i].style.top = stickPositionsY[i] + "px";
                 }
             }
         }
@@ -692,8 +697,8 @@
                 
                 for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
                 {
-                    waves[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);
-                    waves[i][frameIndex].style.transform = "scale(70%)";
+                    waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);
+                    waveElements[i][frameIndex].style.transform = "scale(70%)";
                     
                 }
 
@@ -711,8 +716,8 @@
     
     function MinigameInitWelcome()
     {
-        welcome = document.getElementById("welcome");
-        welcome.style.opacity = 0;
+        welcomeElement = document.getElementById("welcome");
+        welcomeElement.style.opacity = 0;
 		
         welcomeScore = document.getElementById("welcomeScore");
 
@@ -725,7 +730,7 @@
 		welcomeStartBlinkOn = true;
 		welcomeStartBlinkTimer = menuBlinkInterval;
 	
-        welcome.style.opacity = 1;
+        welcomeElement.style.opacity = 1;
 
 		if(minigameRecordExists)
 		{
@@ -742,7 +747,7 @@
     
     function MinigameFinishWelcome()
     {
-        welcome.style.opacity = 0;
+        welcomeElement.style.opacity = 0;
         console.log("Finishing welcome");
     }
     
@@ -764,8 +769,8 @@
             
             if(!soundIsPlaying)
             {
-                soundAmbientMusic.play();
-                soundAmbient.play();
+                soundAmbientMusicElement.play();
+                soundAmbientElement.play();
                 soundIsPlaying = true;
             }
 
@@ -778,18 +783,18 @@
     
     function MinigameInitGameOver()
     {
-        gameOver = document.getElementById("gameOver");
+        gameOverElement = document.getElementById("gameOver");
         gameOverScore = document.getElementById("gameOverScore");
         gameOverRestart = document.getElementById("gameOverRestart");
-        gameOver.style.opacity = 0;
+        gameOverElement.style.opacity = 0;
         gameOverRestart.style.opacity = 0;
     }
         
     function MinigameEnterGameOver()
     {
-	    points.style.opacity = 0;            
+	    pointsElement.style.opacity = 0;            
 	
-        gameOver.style.opacity = 1;        
+        gameOverElement.style.opacity = 1;        
         gameOverScore.innerHTML = "sailed " + (Math.floor(minigamePoints / 10) * 10);
 
 		gameOverRestartBlinkOn = true;
@@ -806,7 +811,7 @@
     
     function MinigameExitGameOver()
     {
-        gameOver.style.opacity = 0;
+        gameOverElement.style.opacity = 0;
         gameOverRestart.style.opacity = 0;
     }
         
@@ -815,7 +820,7 @@
     {
         if(shipPosY > sceneHeight)
         {
-            ship.style.rotate = "0deg";
+            shipElement.style.rotate = "0deg";
 			
             if(gameOverRestartTimer > 0)
             {
@@ -853,23 +858,23 @@
     function MinigameInit()
     {    
         
-        soundJump = document.getElementById("jumpSound");
-        soundJump.volume = soundJumpVolume;
+        soundJumpElement = document.getElementById("jumpSound");
+        soundJumpElement.volume = soundJumpVolume;
 		
-		if(minigameSwitchNoSound) { soundJump.volume = 0; }
+		if(minigameSwitchNoSound) { soundJumpElement.volume = 0; }
 
-        soundAmbientMusic = document.getElementById("ambientMusic");
-        soundAmbientMusic.volume = soundAmbientMusicVolume;
-        soundAmbientMusic.loop = true;
+        soundAmbientMusicElement = document.getElementById("ambientMusic");
+        soundAmbientMusicElement.volume = soundAmbientMusicVolume;
+        soundAmbientMusicElement.loop = true;
 
-        soundAmbient = document.getElementById("ambientSound");
-        soundAmbient.volume = soundAmbientVolume;
-        soundAmbient.loop = true;
+        soundAmbientElement = document.getElementById("ambientSound");
+        soundAmbientElement.volume = soundAmbientVolume;
+        soundAmbientElement.loop = true;
 
 		if(minigameSwitchNoSound)
         {
-            soundAmbientMusic.volume = 0;
-            soundAmbient.volume = 0;
+            soundAmbientMusicElement.volume = 0;
+            soundAmbientElement.volume = 0;
         }
 
         soundIsPlaying = false;
