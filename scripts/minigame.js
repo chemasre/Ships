@@ -12,23 +12,30 @@
     
     var level = 0;
     var levelCount = 5;
-	var levelMessages = ["", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
+	var levelMessages = ["", "those aren't mountains", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
     
-    var levelDuration                        = [   10  ,   10  ,   10  ,   10  ];
-    var levelSpeedX                          = [ -400  , -500  , -700  , -700  ];
-    var levelStickSpawnGroupSeparation       = [  300  ,  400  ,  500  ,  500  ];
-    var levelStickSpawnGroupChances          = [    2  ,    3  ,    4  ,    4  ];
-    var levelStickSpawnGroupMaxMembers       = [    2  ,    3  ,    4  ,    4  ];
-    var levelStickSpawnGroupMemberSeparation = [   80  ,   80  ,   80  ,   80  ];    
-    var levelStickTopPosY                    = [  290  ,  280  ,  270  ,  270  ];    
+    var levelDuration                        = [   10  ,   10  ,   10  ,   10  ,   10  ];
+    var levelSpeedX                          = [ -400  , -500  , -500  , -700  , -700  ];
+    var levelStickSpawnGroupSeparation       = [  300  ,  400  ,  400  ,  500  ,  500  ];
+    var levelStickSpawnGroupChances          = [    2  ,    0  ,    3  ,    4  ,    4  ];
+    var levelStickSpawnGroupMaxMembers       = [    2  ,    0  ,    3  ,    4  ,    4  ];
+    var levelStickSpawnGroupMemberSeparation = [   80  ,   80  ,   80  ,   80  ,   80  ];    
+    var levelStickTopPosY                    = [  290  ,  280  ,  280  ,  270  ,  270  ];    
     
     var levelModeJump = 0;
     var levelModeBackground = 1;
     var levelModeWaves = 2;
     
-    var levelModes = [levelModeJump, levelModeBackground, levelModeJump, levelModeBackground];
-    var levelChanging;
+    var levelModes = [levelModeJump, levelModeWaves, levelModeBackground, levelModeJump, levelModeBackground];
+	
+	var levelChangeDuration = 3;
+	
+	var levelStatePlaying = 0;
+    var levelStateChanging = 1;
+	var levelStateStopped = 2;
     
+	var levelState;
+	
     var levelTimer;
     
     var pointsElement;
@@ -232,7 +239,7 @@
             for(var j = 0; j < numWaveFrames; j++)
             {
                 waveElements[i].push(document.getElementById("wave" + (i + 1) + "" + (j + 1)));
-                
+				
                 waveElements[i][j].style.display = "none";
             }
         }
@@ -248,7 +255,8 @@
         
         level = 0;
         levelTimer = levelDuration[0];
-        levelChanging = false;
+		
+		levelState = levelStatePlaying;
     
         minigamePoints = 0;
         pointsElement.innerHTML = 0;        
@@ -326,24 +334,11 @@
 
         for(var i = 0; i < numWaves; i++)
         {
-            waveElements.push(new Array());
             for(var j = 0; j < numWaveFrames; j++)
             {
                 waveElements[i][j].style.display = "block";
+				waveElements[i][j].style.transform = "scale(0%)";
             }
-
-            waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
-            waveFrames[i] = MinigameRandomRangeInt(0, numWaveFrames);
-            
-            for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
-            {
-                waveElements[i][frameIndex].style.display = "block";
-                waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
-                waveElements[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
-                waveElements[i][frameIndex].style.transform = "scale(0%)";
-            }
-            
-
         }
         
         
@@ -377,7 +372,25 @@
 			console.log("Stored: " + minigamePoints.toString());
 			
 		}
+
+		// Finish waves
+		
+		for(var i = 0; i < numWaves; i++)
+        {
+            for(var j = 0; j < numWaveFrames; j++)
+            {
+                waveElements[i][j].style.display = "none";
+            }
+        }
+	
+		ApplyCSSChangesNow();
     }
+	
+	function ApplyCSSChangesNow()
+	{
+		// See https://stackoverflow.com/questions/45319754/restart-css-transition
+		ship.getBoundingClientRect();		
+	}
     
     function MinigameSetShipInForeground(value)
     {
@@ -438,30 +451,71 @@
         if(shipDead)
         {
             messageElement.style.opacity = 0;
-            levelChanging = false;
+            levelState = levelStateStopped;
         }
         else if(level < levelCount - 1)
         {
-            if(!levelChanging)
+            if(levelState == levelStatePlaying)
             {
                 levelTimer -= minigameTimeStep;
                 if(levelTimer < 0)
                 {
-                    levelChanging = true;
+                    levelState = levelStateChanging;
+					levelTimer = levelChangeDuration;
 					messageElement.style.opacity = 1;
 					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
                     console.log("Changing level");
+					
+					if(levelModes[level] == levelModeWaves)
+					{
+						// Exit wave mode level
+						
+						for(var i = 0; i < numWaves; i++)
+						{							
+							for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+							{
+								waveElements[i][frameIndex].style.transform = "scale(0%)";
+							}		
+						}
+						
+					}					
                 }
 
             }
-            else
+            else if(levelState == levelStateChanging)
             {
-                if(stickLastSpawnGroupChanceX < -stickWidth)
+				var levelMode = levelModes[level];
+				
+                levelTimer -= minigameTimeStep;
+				
+                if(((levelMode == levelModeBackground || levelMode == levelModeJump) && stickLastSpawnGroupChanceX < -stickWidth ||
+				     levelMode == levelModeWaves) && levelTimer <= 0)
                 {
 					messageElement.style.opacity = 0;
-                    levelChanging = false;
+                    levelState = levelStatePlaying;
                     levelTimer = levelDuration[level + 1];
                     sceneTargetSpeedX = levelSpeedX[level + 1];
+					
+					if(levelModes[level + 1] == levelModeWaves)
+					{
+						// Enter wave mode level
+						
+						for(var i = 0; i < numWaves; i++)
+						{
+							waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+							waveFrames[i] = MinigameRandomRangeInt(0, numWaveFrames);
+							
+							for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+							{
+								waveElements[i][frameIndex].style.display = "block";
+								waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
+								waveElements[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
+								waveElements[i][frameIndex].style.transform = "scale(70%)";
+							}		
+						}
+
+					}
+					
                     level ++;
                     
                     
@@ -604,108 +658,114 @@
         shipElement.style.top = shipPosY + "px";    
 
         // Update sticks
+		
+		if(levelModes[level] == levelModeJump || levelModes[level] == levelModeBackground)
+		{
+			var spawnGroupChance = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupChances[level];
 
-        var spawnGroupChance = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupChances[level];
+			if(sceneWidth - stickLastSpawnGroupChanceX > levelStickSpawnGroupSeparation[level] && levelState == levelStatePlaying)
+			{
+				var spawnableIndex = MinigameFindSpawnableElement(stickElements);
+				
+				if(spawnableIndex >= 0)
+				{
+					if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
+					{
+						var spawnInForeground = isBackgroundMode ? (MinigameRandomRangeInt(0, 2) == 0) : true;
+						
+						stickElements[spawnableIndex].style.display = "block";
+						if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
 
-        if(sceneWidth - stickLastSpawnGroupChanceX > levelStickSpawnGroupSeparation[level] && !levelChanging)
-        {
-            var spawnableIndex = MinigameFindSpawnableElement(stickElements);
-            
-            if(spawnableIndex >= 0)
-            {
-                if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
-                {
-                    var spawnInForeground = isBackgroundMode ? (MinigameRandomRangeInt(0, 2) == 0) : true;
-                    
-                    stickElements[spawnableIndex].style.display = "block";
-					if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
+						var groupMembers = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupMaxMembers[level];
+						
+						//console.log("Spawned group with " + (groupMembers + 1) + " members");
+						
+						for(var i = 0; i < groupMembers; i++)
+						{
+							var groupMemberIndex = MinigameFindSpawnableElement(stickElements);
+							if(groupMemberIndex >= 0)
+							{
+								stickPositionsX[groupMemberIndex] = sceneWidth + levelStickSpawnGroupMemberSeparation[level] * (i + 1);
+								stickPositionsY[groupMemberIndex] = levelStickTopPosY[level];   
+								stickInForeground[groupMemberIndex] = spawnInForeground;
+								stickElements[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+								stickElements[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+								stickElements[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
+								stickElements[groupMemberIndex].style.display = "block";
+								if(minigameSwitchNoSticks) { stickElements[groupMemberIndex].style.display = "none"; }
+							}
+						}
+						
+						stickSpawnGroupMissedChances = 0;
+					}
+					else
+					{
+						stickElements[spawnableIndex].style.display = "none";
+						
+						stickSpawnGroupMissedChances ++;
+					}
+					stickPositionsX[spawnableIndex] = sceneWidth;
+					stickPositionsY[spawnableIndex] = levelStickTopPosY[level];
+					stickInForeground[spawnableIndex] = spawnInForeground;
+					stickElements[spawnableIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
+					stickElements[spawnableIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
+					stickElements[spawnableIndex].style.zIndex = spawnInForeground ? 0 : -1;
+					stickLastSpawnGroupChanceX = sceneWidth;
+				}
+			
+			}
 
-                    var groupMembers = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupMaxMembers[level];
-                    
-                    //console.log("Spawned group with " + (groupMembers + 1) + " members");
-                    
-                    for(var i = 0; i < groupMembers; i++)
-                    {
-                        var groupMemberIndex = MinigameFindSpawnableElement(stickElements);
-                        if(groupMemberIndex >= 0)
-                        {
-                            stickPositionsX[groupMemberIndex] = sceneWidth + levelStickSpawnGroupMemberSeparation[level] * (i + 1);
-                            stickPositionsY[groupMemberIndex] = levelStickTopPosY[level];   
-                            stickInForeground[groupMemberIndex] = spawnInForeground;
-                            stickElements[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
-                            stickElements[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
-                            stickElements[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
-                            stickElements[groupMemberIndex].style.display = "block";
-							if(minigameSwitchNoSticks) { stickElements[groupMemberIndex].style.display = "none"; }
-                        }
-                    }
-                    
-                    stickSpawnGroupMissedChances = 0;
-                }
-                else
-                {
-                    stickElements[spawnableIndex].style.display = "none";
-                    
-                    stickSpawnGroupMissedChances ++;
-                }
-                stickPositionsX[spawnableIndex] = sceneWidth;
-                stickPositionsY[spawnableIndex] = levelStickTopPosY[level];
-                stickInForeground[spawnableIndex] = spawnInForeground;
-                stickElements[spawnableIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
-                stickElements[spawnableIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
-                stickElements[spawnableIndex].style.zIndex = spawnInForeground ? 0 : -1;
-                stickLastSpawnGroupChanceX = sceneWidth;
-            }
-        
-        }
+			stickLastSpawnGroupChanceX += sceneSpeedX * minigameTimeStep;
+			
+			for(var i = 0; i < numSticks; i++)
+			{
+				if(stickElements[i].style.display != "none")
+				{
+					var behindShipBefore = (stickPositionsX[i] < shipPosX);
+				
+					stickPositionsX[i] += sceneSpeedX * minigameTimeStep;
+				
+					var behindShipAfter = (stickPositionsX[i] < shipPosX);
+					
+					if(!behindShipBefore && behindShipAfter && !shipDead) { minigamePoints += minigamePointsPerStick; }
 
-        stickLastSpawnGroupChanceX += sceneSpeedX * minigameTimeStep;
-        
-        for(var i = 0; i < numSticks; i++)
-        {
-            if(stickElements[i].style.display != "none")
-            {
-                var behindShipBefore = (stickPositionsX[i] < shipPosX);
-            
-                stickPositionsX[i] += sceneSpeedX * minigameTimeStep;
-            
-                var behindShipAfter = (stickPositionsX[i] < shipPosX);
-                
-                if(!behindShipBefore && behindShipAfter && !shipDead) { minigamePoints += minigamePointsPerStick; }
+					if(stickPositionsX[i] <= -stickKillDistance)
+					{
+						stickElements[i].style.display = "none";
+					}
+					else
+					{
+						stickElements[i].style.left = stickPositionsX[i] + "px";
+						stickElements[i].style.top = stickPositionsY[i] + "px";
+					}
+				}
+			}
+		}
 
-                if(stickPositionsX[i] <= -stickKillDistance)
-                {
-                    stickElements[i].style.display = "none";
-                }
-                else
-                {
-                    stickElements[i].style.left = stickPositionsX[i] + "px";
-                    stickElements[i].style.top = stickPositionsY[i] + "px";
-                }
-            }
-        }
         
         // Update waves
         
-        for(var i = 0; i < numWaves; i++)
-        {
-            waveTimers[i] -= minigameTimeStep;
-            if(waveTimers[i] < 0)
-            {
-                waveFrames[i]++;
-                if(waveFrames[i] >= numWaveFrames) { waveFrames[i] = 0; }
-                
-                for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
-                {
-                    waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);
-                    waveElements[i][frameIndex].style.transform = "scale(70%)";
-                    
-                }
+		if(levelModes[level] == levelModeWaves)
+		{
+			for(var i = 0; i < numWaves; i++)
+			{
+				waveTimers[i] -= minigameTimeStep;
+				if(waveTimers[i] < 0)
+				{
+					waveFrames[i]++;
+					if(waveFrames[i] >= numWaveFrames) { waveFrames[i] = 0; }
+					
+					for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+					{
+						waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);
+						
+					}
 
-                waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
-            }
-            
-        }
+					waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+				}
+			}
+		}
+		
     
     }    
 
