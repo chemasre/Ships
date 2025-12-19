@@ -14,19 +14,28 @@
     var levelCount = 5;
 	var levelMessages = ["", "those aren't mountains", "no compass can help me", "oh yes! they float, Georgie", "those aren't mountains"];
     
-    var levelDuration                        = [   10  ,   10  ,   10  ,   10  ,   10  ];
+    var lmJump = 0;
+    var lmBack = 1;
+    var lmWaves = 2;
+
+    var levelModes                           = [ lmJump,lmWaves, lmBack, lmJump, lmBack];
+    var levelDuration                        = [    3  ,  100  ,   10  ,   10  ,   10  ];
     var levelSpeedX                          = [ -400  , -500  , -500  , -700  , -700  ];
     var levelStickSpawnGroupSeparation       = [  300  ,  400  ,  400  ,  500  ,  500  ];
     var levelStickSpawnGroupChances          = [    2  ,    0  ,    3  ,    4  ,    4  ];
     var levelStickSpawnGroupMaxMembers       = [    2  ,    0  ,    3  ,    4  ,    4  ];
     var levelStickSpawnGroupMemberSeparation = [   80  ,   80  ,   80  ,   80  ,   80  ];    
-    var levelStickTopPosY                    = [  290  ,  280  ,  280  ,  270  ,  270  ];    
+    var levelStickTopPosY                    = [  290  ,  280  ,  280  ,  270  ,  270  ];
+	var levelWavesSpeed						 = [    0  ,   30  ,   30  ,    0  ,    0  ];
+	var levelWavesSeparationMin			     = [    0  ,  250  ,    0  ,    0  ,    0  ];
+	var levelWavesSeparationMax			     = [    0  ,  600  ,    0  ,    0  ,    0  ];
+	var levelWavesPositionXMin			     = [    0  , -300  ,    0  ,    0  ,    0  ];
+	var levelWavesPositionXMax			     = [    0  ,  300  ,    0  ,    0  ,    0  ];
+	var levelWavesSpeedMin			         = [    0  ,   50  ,    0  ,    0  ,    0  ];
+	var levelWavesSpeedMax			         = [    0  ,  100  ,    0  ,    0  ,    0  ];
+	var levelWavesChangeIntervalMin          = [    0  ,    1  ,    0  ,    0  ,    0  ];
+	var levelWavesChangeIntervalMax          = [    0  ,    3  ,    0  ,    0  ,    0  ];
     
-    var levelModeJump = 0;
-    var levelModeBackground = 1;
-    var levelModeWaves = 2;
-    
-    var levelModes = [levelModeJump, levelModeWaves, levelModeBackground, levelModeJump, levelModeBackground];
 	
 	var levelChangeDuration = 3;
 	
@@ -70,7 +79,7 @@
     
     // Input
     
-    var inputJumpWasPressed;
+    var inputActionWasPressed;
     
     // Sound
     
@@ -126,6 +135,13 @@
     var shipForegroundTransform = "translate(0%, 0%)";
     var shipBackgroundFilter = "sepia(10%) saturate(30%) brightness(40%) hue-rotate(50deg)";
     var shipBackgroundTransform = "translate(10%, 10%) scale(80%)";
+	
+	var shipJumpForwardSpeedX = 200;
+	var shipJumpForwardSpeedY = -100;
+	
+	var shipReturnSpeedX = -100;
+	
+	var shipSpeedX = 0;
     
     var shipPosX;
     var shipPosY;
@@ -166,14 +182,28 @@
     var waveElements;
     var numWaves = 2;
     var numWaveFrames = 3;
-    var waveTimers;
-    var waveFrameIntervalMin = 0.2;
-    var waveFrameIntervalMax = 0.2;
+	var waveActive;
+    var waveAnimationTimers;
+    var waveAnimationIntervalMin = 0.2;
+    var waveAnimationIntervalMax = 0.2;
     var waveMainFrameOpacity = 1.0;
     var waveOtherFrameOpacity = 0;    
     var waveFrames;
-    var wavesPositionX = -300;
-    var waveSeparation = 700;
+	var waveScaleFactor = 0.7;
+	var waveWidth = 543;
+	
+	var wavesStartPositionX = -300;
+	var wavesStartSeparation = 900;
+	
+    var wavesPositionX = 0;
+    var wavesSeparation = 0;
+	
+	var wavesTargetPositionX = -300;
+	var wavesTargetSeparation = 1200;
+	var wavesCollisionOffset = 307 * 0.7;
+	var wavesCollisionWidth = 100 * 0.7;
+	var wavesSpeed = 10;
+	var wavesChangeTimer = 2;
     
     var shipElement;
     
@@ -231,10 +261,12 @@
         }
         
         waveElements = new Array();
-        waveTimers = new Array();
+        waveAnimationTimers = new Array();
+		waveActive = new Array();
         waveFrames = new Array();
         for(var i = 0; i < numWaves; i++)
         {
+			waveActive.push(false);
             waveElements.push(new Array());
             for(var j = 0; j < numWaveFrames; j++)
             {
@@ -334,6 +366,7 @@
 
         for(var i = 0; i < numWaves; i++)
         {
+			waveActive[i] = false;
             for(var j = 0; j < numWaveFrames; j++)
             {
                 waveElements[i][j].style.display = "block";
@@ -377,6 +410,7 @@
 		
 		for(var i = 0; i < numWaves; i++)
         {
+			waveActive[i] = false;
             for(var j = 0; j < numWaveFrames; j++)
             {
                 waveElements[i][j].style.display = "none";
@@ -466,12 +500,14 @@
 					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
                     console.log("Changing level");
 					
-					if(levelModes[level] == levelModeWaves)
+					if(levelModes[level] == lmWaves)
 					{
 						// Exit wave mode level
 						
 						for(var i = 0; i < numWaves; i++)
-						{							
+						{				
+							waveActive[i] = false;
+							
 							for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
 							{
 								waveElements[i][frameIndex].style.transform = "scale(0%)";
@@ -488,29 +524,38 @@
 				
                 levelTimer -= minigameTimeStep;
 				
-                if(((levelMode == levelModeBackground || levelMode == levelModeJump) && stickLastSpawnGroupChanceX < -stickWidth ||
-				     levelMode == levelModeWaves) && levelTimer <= 0)
+                if(((levelMode == lmBack || levelMode == lmJump) && stickLastSpawnGroupChanceX < -stickWidth ||
+				     levelMode == lmWaves) && levelTimer <= 0)
                 {
 					messageElement.style.opacity = 0;
                     levelState = levelStatePlaying;
                     levelTimer = levelDuration[level + 1];
                     sceneTargetSpeedX = levelSpeedX[level + 1];
 					
-					if(levelModes[level + 1] == levelModeWaves)
+					if(levelModes[level + 1] == lmWaves)
 					{
 						// Enter wave mode level
 						
+						wavesPositionX = wavesStartPositionX;
+						wavesSeparation = wavesStartSeparation;
+						
+						wavesTargetPositionX = wavesStartPositionX;
+						wavesTargetSeparation = wavesStartSeparation;
+						wavesChangeTimer = MinigameRandomRange(levelWavesChangeIntervalMin[level + 1], levelWavesChangeIntervalMax[level + 1]);  
+						
 						for(var i = 0; i < numWaves; i++)
 						{
-							waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+							waveActive[i] = true;
+							
+							waveAnimationTimers[i] = MinigameRandomRange(waveAnimationIntervalMin, waveAnimationIntervalMax);
 							waveFrames[i] = MinigameRandomRangeInt(0, numWaveFrames);
 							
 							for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
 							{
 								waveElements[i][frameIndex].style.display = "block";
 								waveElements[i][frameIndex].style.opacity = (frameIndex == waveFrames[i] ? waveMainFrameOpacity : waveOtherFrameOpacity);                
-								waveElements[i][frameIndex].style.left = wavesPositionX + (i * waveSeparation) + "px";
-								waveElements[i][frameIndex].style.transform = "scale(70%)";
+								waveElements[i][frameIndex].style.left = wavesPositionX - waveWidth / 2 * (1 - waveScaleFactor) + (i * wavesSeparation) + "px";
+								waveElements[i][frameIndex].style.transform = "scale(" + (waveScaleFactor * 100) + "%)";
 							}		
 						}
 
@@ -592,26 +637,49 @@
         
         // Update ship
         
-        var isBackgroundMode = (levelModes[level] == levelModeBackground);
+        var isBackgroundMode = (levelModes[level] == lmBack);
+		var isWavesMode = (levelModes[level] == lmWaves);
+		var isJumpMode = (levelModes[level] == lmJump);
         
-        if(inputJumpWasPressed && !shipJumping && !shipDead)
+        if(inputActionWasPressed && !shipJumping && !shipDead)
         {
-            shipSpeedY = !isBackgroundMode ? shipJumpSpeed : shipJumpBackgroundSpeed;
+			if(isJumpMode)
+			{
+				shipSpeedY = shipJumpSpeed;
+				shipElement.style.rotate = "-10deg";  
+			}
+			else if(isBackgroundMode)
+			{
+				shipSpeedY = shipJumpBackgroundSpeed;
+				shipElement.style.rotate = "-10deg";  
+			}
+			else // isWavesMode
+			{
+				shipSpeedX = shipJumpForwardSpeedX;
+				shipSpeedY = shipJumpForwardSpeedY;
+				shipElement.style.rotate = "-3deg";  
+			}
+			
             shipJumping = true;
             soundJumpElement.play();
-            shipElement.style.rotate = "-10deg";  
 
             if(shipInForeground) { MinigameSetShipInForeground(false); }
             else { MinigameSetShipInForeground(true); }
+			
+
         }    
         
         if(!shipInForeground && !isBackgroundMode) 
         {
             MinigameSetShipInForeground(true);
         }
+		
+		shipPosX += shipSpeedX * minigameTimeStep;			
+		if(shipPosX < shipStartPosX) { shipPosX = shipStartPosX; shipSpeedX = 0; }
+	
 
         if(shipJumping)
-        {
+        {		
             shipPosY += shipSpeedY * minigameTimeStep;
             shipSpeedY += shipGravity * minigameTimeStep;
             
@@ -621,8 +689,13 @@
                 shipSpeedY = 0;
 
                 shipJumping = false;
+                shipElement.style.rotate = "0deg";
+				
+				if(isWavesMode)
+				{
+					shipSpeedX = shipReturnSpeedX;
+				}
 
-                shipElement.style.rotate = "0deg";        
             }
         }
         else if(shipDead)
@@ -636,6 +709,8 @@
         
 		if(!shipDead)
 		{
+			var shipCollided = false;
+			
 			for(var i = 0; i < numSticks; i++)
 			{
 				if(stickElements[i].style.display != "none")
@@ -643,15 +718,39 @@
 					if(Math.abs(stickPositionsX[i] + stickWidth / 2 - (shipPosX + shipWidth / 2)) < shipCollisionWidth &&
 						shipPosY + shipHeight >= stickPositionsY[i] && shipInForeground == stickInForeground[i])
 					{
-						shipDead = true;
-						if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
-						sceneTargetSpeedX = 0;
-						minigameState = minigameStateGameOver;
-						MinigameEnterGameOver();
+						shipCollided = true;
 					}
 						
 				}
 			}
+			
+			for(var i = 0; i < numWaves; i++)
+			{
+				if(waveActive[i])
+				{
+					var waveLeft = wavesPositionX + (i * wavesSeparation) + wavesCollisionOffset - wavesCollisionWidth / 2;
+					var waveRight = waveLeft + wavesCollisionWidth;
+					var shipLeft = shipPosX + shipWidth / 2 - shipCollisionWidth / 2;
+					var shipRight = shipLeft + shipCollisionWidth;
+					
+					
+					if(!(shipLeft > waveRight || shipRight < waveLeft))
+					{
+						shipCollided = true;
+					}
+				}
+			}
+			
+			if(shipCollided)
+			{
+				shipDead = true;
+				if(shipSpeedY < 0) { shipSpeedY = Math.abs(shipSpeedY); }
+				sceneTargetSpeedX = 0;
+				minigameState = minigameStateGameOver;
+				MinigameEnterGameOver();
+				
+			}
+
 		}
         
         shipElement.style.left = shipPosX + "px";
@@ -659,7 +758,7 @@
 
         // Update sticks
 		
-		if(levelModes[level] == levelModeJump || levelModes[level] == levelModeBackground)
+		if(levelModes[level] == lmJump || levelModes[level] == lmBack)
 		{
 			var spawnGroupChance = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupChances[level];
 
@@ -745,12 +844,54 @@
         
         // Update waves
         
-		if(levelModes[level] == levelModeWaves)
+		if(levelModes[level] == lmWaves)
 		{
+			wavesChangeTimer -= minigameTimeStep;
+			
+			if(wavesChangeTimer <= 0)
+			{
+				wavesTargetPositionX = MinigameRandomRange(levelWavesPositionXMin[level], levelWavesPositionXMax[level]);
+				wavesTargetSeparation = MinigameRandomRange(levelWavesSeparationMin[level], levelWavesSeparationMax[level]);
+				wavesSpeed = MinigameRandomRange(levelWavesSpeedMin[level], levelWavesSpeedMax[level]);
+				wavesChangeTimer = MinigameRandomRange(levelWavesChangeIntervalMin[level], levelWavesChangeIntervalMax[level]);
+			}
+			
+			if(wavesPositionX < wavesTargetPositionX)
+			{
+				wavesPositionX += wavesSpeed * minigameTimeStep;
+				if(wavesPositionX > wavesTargetPositionX) { wavesPositionX = wavesTargetPositionX; }
+			}
+			else if(wavesPositionX > wavesTargetPositionX)
+			{
+				wavesPositionX -= wavesSpeed * minigameTimeStep;
+				if(wavesPositionX < wavesTargetPositionX) { wavesPositionX = wavesTargetPositionX; }			
+			}
+			
+			if(wavesSeparation < wavesTargetSeparation)
+			{
+				wavesSeparation += wavesSpeed * minigameTimeStep;
+				if(wavesSeparation > wavesTargetSeparation) { wavesSeparation = wavesTargetSeparation; }
+			}
+			else if(wavesSeparation > wavesTargetSeparation)
+			{
+				wavesSeparation -= wavesSpeed * minigameTimeStep;
+				if(wavesSeparation < wavesTargetSeparation) { wavesSeparation = wavesTargetSeparation; }			
+			}
+
 			for(var i = 0; i < numWaves; i++)
 			{
-				waveTimers[i] -= minigameTimeStep;
-				if(waveTimers[i] < 0)
+				// Update wave position
+
+				for(var frameIndex = 0; frameIndex < numWaveFrames; frameIndex ++)
+				{
+					waveElements[i][frameIndex].style.left = wavesPositionX - waveWidth / 2 * (1 - waveScaleFactor) + (i * wavesSeparation) + "px";
+					
+				}
+				
+				// Update wave animation
+				
+				waveAnimationTimers[i] -= minigameTimeStep;
+				if(waveAnimationTimers[i] < 0)
 				{
 					waveFrames[i]++;
 					if(waveFrames[i] >= numWaveFrames) { waveFrames[i] = 0; }
@@ -761,7 +902,7 @@
 						
 					}
 
-					waveTimers[i] = MinigameRandomRange(waveFrameIntervalMin, waveFrameIntervalMax);
+					waveAnimationTimers[i] = MinigameRandomRange(waveAnimationIntervalMin, waveAnimationIntervalMax);
 				}
 			}
 		}
@@ -821,7 +962,7 @@
 			welcomeStartBlinkTimer = menuBlinkInterval;
 		}
 				
-        if(inputJumpWasPressed)
+        if(inputActionWasPressed)
         {
             MinigameFinishWelcome();
             MinigameEnterPlay();
@@ -896,7 +1037,7 @@
 					gameOverRestartBlinkTimer = menuBlinkInterval;
 				}
                 
-                if(inputJumpWasPressed)
+                if(inputActionWasPressed)
                 {
                     MinigameExitPlay();
                     MinigameExitGameOver();
@@ -970,7 +1111,7 @@
             MinigameUpdateGameOver();
         }
     
-        inputJumpWasPressed = false;
+        inputActionWasPressed = false;
 
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
     }
@@ -979,13 +1120,13 @@
     {
         if(e.key == " ")
         {
-            inputJumpWasPressed = true;
+            inputActionWasPressed = true;
         }
     }
     
     function MinigameOnClick(e)
     {
-        inputJumpWasPressed = true;
+        inputActionWasPressed = true;
     }
 	
 	function MinigameRandomRange(a, b)
