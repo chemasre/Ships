@@ -195,6 +195,8 @@ body
 	left:50%;
 	top:42%;
 	transform:translate(-50%, -50%);
+	
+	width:100%;
 }
 
 #gameOverScore
@@ -210,9 +212,9 @@ body
 	transition: opacity 0.5s ease-in-out;
 }
 
-#welcome
+#welcomeTitle
 {
-	font-size:50px;
+	font-size:45px;
 }
 
 #welcomeScore

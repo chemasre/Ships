@@ -1,33 +1,46 @@
     var levelCount = 5;
 	
-	var _jump = 0;
-	var _back = 1;
-	var _wave = 2;
+	var _null = 0;
+	var _jump = 1;
+	var _back = 2;
+	var _wave = 3;
 	
 	var levelMessages =
 	[
 		"",
-		"those aren't mountains",
-		"no compass can help me",
-		"oh yes! they float, Georgie",
-		"those aren't mountains"
+		"13: \"There's a long way ahead\"",
+		"12: \"Take care of me\"",
+		"11:",
+		"10: no compass can help me",
+		"9:",
+		"8:",
+		"7:",
+		"6:",
+		"5:",
+		"4:",
+		"3:",
 	];
 	
+	// SpawnGroupChances  1 -> 100%  2-> 50%  3-> 33% ...
 	
-    var levelModes                           = [ _jump  , _wave  , _back  , _jump , _back  ];
-    var levelDuration                        = [     3  ,   100  ,    10  ,   10  ,    10  ];
-    var levelSpeedX                          = [  -400  ,  -500  ,  -500  , -700  ,  -700  ];
-    var levelStickSpawnGroupSeparation       = [   300  ,   400  ,   400  ,  500  ,   500  ];
-    var levelStickSpawnGroupChances          = [     2  ,     0  ,     3  ,    4  ,     4  ];
-    var levelStickSpawnGroupMaxMembers       = [     2  ,     0  ,     3  ,    4  ,     4  ];
-    var levelStickSpawnGroupMemberSeparation = [    80  ,    80  ,    80  ,   80  ,    80  ];    
-    var levelStickTopPosY                    = [   290  ,   280  ,   280  ,  270  ,   270  ];
-	var levelWavesSpeed						 = [     0  ,    30  ,    30  ,    0  ,     0  ];
-	var levelWavesSeparationMin			     = [     0  ,   250  ,     0  ,    0  ,     0  ];
-	var levelWavesSeparationMax			     = [     0  ,   600  ,     0  ,    0  ,     0  ];
-	var levelWavesPositionXMin			     = [     0  ,  -300  ,     0  ,    0  ,     0  ];
-	var levelWavesPositionXMax			     = [     0  ,   300  ,     0  ,    0  ,     0  ];
-	var levelWavesSpeedMin			         = [     0  ,    50  ,     0  ,    0  ,     0  ];
-	var levelWavesSpeedMax			         = [     0  ,   100  ,     0  ,    0  ,     0  ];
-	var levelWavesChangeIntervalMin          = [     0  ,     1  ,     0  ,    0  ,     0  ];
-	var levelWavesChangeIntervalMax          = [     0  ,     3  ,     0  ,    0  ,     0  ];
+    var levelModes                           = [ _null  , _jump  , _wave  , _back  , _jump , _back  ];
+    var levelDuration                        = [     2  ,    20  ,    20  ,    20  ,   20  ,    20  ];
+    var levelSpeedX                          = [  -100  ,  -400  ,  -500  ,  -500  , -700  ,  -700  ];
+    var levelStickSpawnGroupSeparation       = [     0  ,   300  ,   400  ,   400  ,  500  ,   500  ];
+    var levelStickSpawnGroupChances          = [     0  ,     2  ,     0  ,     3  ,    4  ,     4  ];
+    var levelStickSpawnGroupMaxMembers       = [     0  ,     1  ,     0  ,     3  ,    4  ,     4  ];
+    var levelStickSpawnGroupMemberSeparation = [     0  ,    80  ,     0  ,    80  ,   80  ,    80  ];    
+    var levelStickTopPosY                    = [     0  ,   290  ,     0  ,   280  ,  270  ,   270  ];
+	var levelWavesSpeed						 = [     0  ,     0  ,    30  ,     0  ,    0  ,     0  ];
+	var levelWavesSeparationMin			     = [     0  ,     0  ,   250  ,     0  ,    0  ,     0  ];
+	var levelWavesSeparationMax			     = [     0  ,     0  ,   600  ,     0  ,    0  ,     0  ];
+	var levelWavesPositionXMin			     = [     0  ,     0  ,  -300  ,     0  ,    0  ,     0  ];
+	var levelWavesPositionXMax			     = [     0  ,     0  ,   300  ,     0  ,    0  ,     0  ];
+	var levelWavesSpeedMin			         = [     0  ,     0  ,    50  ,     0  ,    0  ,     0  ];
+	var levelWavesSpeedMax			         = [     0  ,     0  ,   100  ,     0  ,    0  ,     0  ];
+	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     1  ,     0  ,    0  ,     0  ];
+	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     3  ,     0  ,    0  ,     0  ];
+
+
+		// "oh yes! they float, Georgie.",
+		// "those aren't mountains"

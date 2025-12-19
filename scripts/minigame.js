@@ -12,9 +12,10 @@
     
     var level = 0;
     
-    var lmJump = 0;
-    var lmBack = 1;
-    var lmWaves = 2;    
+    var lmNull = 0;
+    var lmJump = 1;
+    var lmBack = 2;
+    var lmWaves = 3;    
 	
 	var levelChangeDuration = 3;
 	
@@ -274,7 +275,7 @@
         pointsElement.style.opacity = 1;
 		
 		messageElement.style.opacity = 0;
-        
+
         // Init scene 
         
         sceneSpeedX = 0;
@@ -327,19 +328,7 @@
             
             stickElements[i].style.display = "none";
             
-        }
-        
-        stickElements[0].style.display = "block";
-        if(minigameSwitchNoSticks) { stickElements[0].style.display = "none"; }
-        stickPositionsX[0] = sceneWidth;
-        stickPositionsY[0] = levelStickTopPosY[level];
-        stickInForeground[0] = true;
-        stickElements[0].style.filter = stickForegroundFilter;
-        stickElements[0].style.transform = stickForegroundTransform;
-        stickElements[0].style.zIndex = 0;        
-        
-        stickLastSpawnGroupChanceX = sceneWidth;
-        stickSpawnGroupMissedChances = 0;
+        }       
         
         // Init waves
 
@@ -504,14 +493,31 @@
                 levelTimer -= minigameTimeStep;
 				
                 if(((levelMode == lmBack || levelMode == lmJump) && stickLastSpawnGroupChanceX < -stickWidth ||
-				     levelMode == lmWaves) && levelTimer <= 0)
+				     levelMode == lmWaves || levelMode == lmNull) && levelTimer <= 0)
                 {
 					messageElement.style.opacity = 0;
                     levelState = levelStatePlaying;
                     levelTimer = levelDuration[level + 1];
                     sceneTargetSpeedX = levelSpeedX[level + 1];
 					
-					if(levelModes[level + 1] == lmWaves)
+					if(levelModes[level + 1] == lmJump || levelModes[level + 1] == lmBack)
+					{
+						// Enter jump or back mode level
+
+						stickElements[0].style.display = "block";
+						if(minigameSwitchNoSticks) { stickElements[0].style.display = "none"; }
+						stickPositionsX[0] = sceneWidth;
+						stickPositionsY[0] = levelStickTopPosY[level + 1];
+						stickInForeground[0] = true;
+						stickElements[0].style.filter = stickForegroundFilter;
+						stickElements[0].style.transform = stickForegroundTransform;
+						stickElements[0].style.zIndex = 0;        
+						
+						stickLastSpawnGroupChanceX = sceneWidth;
+						stickSpawnGroupMissedChances = 0;
+		
+					}					
+					else if(levelModes[level + 1] == lmWaves)
 					{
 						// Enter wave mode level
 						
@@ -618,7 +624,7 @@
         
         var isBackgroundMode = (levelModes[level] == lmBack);
 		var isWavesMode = (levelModes[level] == lmWaves);
-		var isJumpMode = (levelModes[level] == lmJump);
+		var isJumpMode = (levelModes[level] == lmJump || levelModes[level] == lmNull);
         
         if(inputActionWasPressed && !shipJumping && !shipDead)
         {
@@ -632,7 +638,7 @@
 				shipSpeedY = shipJumpBackgroundSpeed;
 				shipElement.style.rotate = "-10deg";  
 			}
-			else // isWavesMode
+			else if(isWavesMode)
 			{
 				shipSpeedX = shipJumpForwardSpeedX;
 				shipSpeedY = shipJumpForwardSpeedY;
@@ -764,7 +770,7 @@
 							if(groupMemberIndex >= 0)
 							{
 								stickPositionsX[groupMemberIndex] = sceneWidth + levelStickSpawnGroupMemberSeparation[level] * (i + 1);
-								stickPositionsY[groupMemberIndex] = levelStickTopPosY[level];   
+								stickPositionsY[groupMemberIndex] = levelStickTopPosY[level]; 
 								stickInForeground[groupMemberIndex] = spawnInForeground;
 								stickElements[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
 								stickElements[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
