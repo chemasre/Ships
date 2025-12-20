@@ -35,9 +35,14 @@
     var minigameStatePlay       = 1;
     var minigameStateGameOver   = 2;
 	
+    var minigameSwitchFastForward = true;
     var minigameSwitchNoDamage = true;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
+    
+    var minigameSwitchFastForwardPressed;
+    var minigameSwitchFastForwardSavedTimeStep;
+    var minigameSwitchFastForwardMultiplier = 3;
     
     // Menus
     var gameOverElement;
@@ -1084,9 +1089,17 @@
         
         document.addEventListener('keydown', MinigameOnKeyDown);
         document.addEventListener('click', MinigameOnClick);
-        
-        
+
         minigameTimeStep = 1.0 / minigameFps;
+        
+        if(minigameSwitchFastForward)
+        {
+            document.addEventListener('keyup', MinigameOnKeyUp);
+            minigameSwitchFastForwardPressed = false;
+            
+            minigameSwitchFastForwardSavedTimeStep = minigameTimeStep;
+        }
+        
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
     }
    
@@ -1107,6 +1120,15 @@
         }
     
         inputActionWasPressed = false;
+        
+        if(minigameSwitchFastForward && minigameSwitchFastForwardPressed)
+        {
+            minigameTimeStep = minigameSwitchFastForwardSavedTimeStep * minigameSwitchFastForwardMultiplier;
+        }
+        else
+        {
+            minigameTimeStep = minigameSwitchFastForwardSavedTimeStep;
+        }
 
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
     }
@@ -1117,8 +1139,22 @@
         {
             inputActionWasPressed = true;
         }
+        else if(e.key == "f" && minigameSwitchFastForward)
+        {
+            minigameSwitchFastForwardPressed = true;
+            console.log("FF on");
+        }
     }
     
+    function MinigameOnKeyUp(e)
+    {
+        if(e.key == "f" && minigameSwitchFastForward)
+        {
+            minigameSwitchFastForwardPressed = false;
+            console.log("FF off");
+        }
+    }
+
     function MinigameOnClick(e)
     {
         inputActionWasPressed = true;
