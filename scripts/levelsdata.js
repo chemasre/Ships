@@ -8,10 +8,10 @@
 	var levelMessages =
 	[
 		"",
-		"13: \"There's a long way ahead\"",
-		"12: \"Take care of me\"",
-		"11:",
-		"10: no compass can help me",
+		"I've been lost in this mist for so long...",
+		"I don't know what to tell myself",
+		"Everything just moves forward",
+		"No compass can help me",
 		"9:",
 		"8:",
 		"7:",
