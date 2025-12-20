@@ -35,6 +35,7 @@
     var minigameStatePlay       = 1;
     var minigameStateGameOver   = 2;
 	
+    var minigameSwitchNoDamage = true;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
     
@@ -87,11 +88,13 @@
     var parallaxObjectsSpeedFactor;
 	var parallaxObjectsSpeedFactorMin = 0.5;
 	var parallaxObjectsSpeedFactorMax = 1.5;
-    var parallaxNumObjects = [4, 2];
-    var parallaxNumPlanes = 2;
     
-    var parallaxMinSeparation = [600, 700];
-    var parallaxMaxSeparation = [1200, 1500];
+    var parallaxThemeFair = 0;
+    
+    var parallaxNumThemes = 1;
+    
+    var parallaxMinSeparation = [1200, 1600];
+    var parallaxMaxSeparation = [2400, 3200];
     var parallaxSeparation = [0, 0];
     
     var parallaxSpeedFactor = [0.2, 0.05];
@@ -234,11 +237,14 @@
             {
                 parallaxObjectElements[i].push(document.getElementById("parallax" + (i + 1) + "Object" + (j + 1)));
                 
+                parallaxObjectElements[i][j].style.transformOrigin = parallaxObjectsCenterX[i][j] + "px " + parallaxObjectsCenterY[i][j] + "px";
+                
                 parallaxObjectElements[i][j].style.display = "none";
                 parallaxObjectsX[i][j] = 0;
 				parallaxObjectsSpeedFactor[i][j] = 0;
             }
         }
+        
         
         waveElements = new Array();
         waveAnimationTimers = new Array();
@@ -595,6 +601,9 @@
                     console.log("Spawning object at plane " + (i + 1));
                     
                     parallaxObjectsX[i][index] = sceneWidth;
+                    parallaxObjectElements[i][index].style.top = MinigameRandomRange(parallaxObjectsYMin[i][index], parallaxObjectsYMax[i][index]) + "px";
+                    parallaxObjectElements[i][index].style.rotate = MinigameRandomRange(parallaxObjectsRotationMin[i][index], parallaxObjectsRotationMax[i][index]) + "deg";
+                    
 					parallaxObjectsSpeedFactor[i][index] = MinigameRandomRange(parallaxObjectsSpeedFactorMin, parallaxObjectsSpeedFactorMax);
                     parallaxObjectElements[i][index].style.display = "block";
                     
@@ -615,6 +624,7 @@
                     if(parallaxObjectsX[i][j] < -900) { parallaxObjectElements[i][j].style.display = "none"; }
                     
                     parallaxObjectElements[i][j].style.left = parallaxObjectsX[i][j] + "px";
+                    
                 }
             }
         }
@@ -692,7 +702,7 @@
 			}
         }
         
-		if(!shipDead)
+		if(!shipDead && !minigameSwitchNoDamage)
 		{
 			var shipCollided = false;
 			
