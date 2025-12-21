@@ -11,12 +11,13 @@
         "Even small actions can have purpose",
         "See? You have reached this point",
         "Sometimes we become sailors of the mist",
-        "We move forward, yet time has frozen for ourselves",
+        "We move forward, yet time has frozen for us",
         "We move forward, yet we look back",
         "We see no purpose, yet we go through",
         "But even small actions can have purpose",
         "See? You have reached this point",
-        "Even if you don",
+        "Now go further",
+        "You have something to say",
         "Time got frozen for you?",
         "What you did you do?",
         "After that day, time got frozen",
@@ -62,8 +63,8 @@
 	var levelWavesSpeedMax			         = [     0  ,     0  ,   100  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
 	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     1  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
 	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     3  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelGlowBackground                  = [     0  ,   0.3  ,     1  ,     1  ,    1  ,     1 ,     1 ,     1 ,     1 ,     1 ,     1 ,     1 ,     1 ,     1 ];
-    var levelGlowForeground                  = [     0  ,  0.04  ,  0.16  ,  0.16  ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ,  0.16 ];
+	var levelGlowBackground                  = [     0  ,   0.3  ,   0.3  ,   0.3  ,   0.3 ,   0.3 ,   0.3 ,   0.3  ,  0.3  ,  0.3 ,   0.3 ,   0.3 ,   0.3 ,   0.3 ];
+    var levelGlowForeground                  = [     0  ,  0.04  ,  0.04  ,  0.04  ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ];
 
 
 		// "oh yes! they float, Georgie.",

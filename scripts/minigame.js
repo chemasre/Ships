@@ -36,7 +36,7 @@
     var minigameStateGameOver   = 2;
 	
     var minigameSwitchFastForward = true;
-    var minigameSwitchNoDamage = false;
+    var minigameSwitchNoDamage = true;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
     
