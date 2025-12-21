@@ -36,13 +36,19 @@
     var minigameStateGameOver   = 2;
 	
     var minigameSwitchFastForward = true;
-    var minigameSwitchNoDamage = true;
+    var minigameSwitchNoDamage = false;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
     
     var minigameSwitchFastForwardPressed;
     var minigameSwitchFastForwardSavedTimeStep;
     var minigameSwitchFastForwardMultiplier = 3;
+    
+    var zIndexParallaxObject = -2;
+    var zIndexShipForeground = 0;
+    var zIndexShipBackground = -1;
+    var zIndexSticksForeground = 0;    
+    var zIndexSticksBackground = -1;    
     
     // Menus
     var gameOverElement;
@@ -85,6 +91,11 @@
     
     var sceneWidth = 900;
     var sceneHeight = 360;
+    
+    // Glow
+    
+    var glowBackgroundElement;
+    var glowForegroundElement;
     
     // Parallax
     
@@ -228,6 +239,13 @@
             stickElements[i].style.display = "none";
         }
         
+        glowForegroundElement = document.getElementById("glowForeground");
+        glowBackgroundElement = document.getElementById("glowBackground");
+        
+        glowForegroundElement.style.opacity = 0;        
+        glowBackgroundElement.style.opacity = 0;        
+        
+        
         parallaxObjectElements = new Array();
         parallaxObjectsX = new Array();
         parallaxObjectsSpeedFactor = new Array();
@@ -292,6 +310,11 @@
         sceneSpeedX = 0;
         sceneTargetSpeedX = levelSpeedX[0];        
         
+        // Init Glow
+        
+        glowForegroundElement.style.opacity = levelGlowForeground[0];
+        glowBackgroundElement.style.opacity = levelGlowBackground[0];
+        
         // Init parallax
         
         
@@ -353,6 +376,7 @@
             }
         }
         
+		ApplyCSSChangesNow();
         
     
     }
@@ -395,6 +419,9 @@
                 waveElements[i][j].style.display = "none";
             }
         }
+        
+        glowForegroundElement.style.opacity = 0;
+        glowBackgroundElement.style.opacity = 0;
 	
 		ApplyCSSChangesNow();
     }
@@ -411,13 +438,13 @@
         {
             shipElement.style.filter = shipForegroundFilter;
             shipElement.style.transform = shipForegroundTransform;
-            shipElement.style.zIndex = 0;
+            shipElement.style.zIndex = zIndexShipForeground;
         }
         else
         {
             shipElement.style.filter = shipBackgroundFilter;
             shipElement.style.transform = shipBackgroundTransform;
-            shipElement.style.zIndex = -1;            
+            shipElement.style.zIndex = zIndexShipBackground;            
         }
         
         shipInForeground = value;
@@ -475,8 +502,13 @@
                 {
                     levelState = levelStateChanging;
 					levelTimer = levelChangeDuration;
+
 					messageElement.style.opacity = 1;
 					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
+
+                    glowForegroundElement.style.opacity = levelGlowForeground[level + 1];
+                    glowBackgroundElement.style.opacity = levelGlowBackground[level + 1];
+
                     console.log("Changing level");
 					
 					if(levelModes[level] == lmWaves)
@@ -493,7 +525,9 @@
 							}		
 						}
 						
-					}					
+					}	
+
+                    
                 }
 
             }
@@ -522,7 +556,7 @@
 						stickInForeground[0] = true;
 						stickElements[0].style.filter = stickForegroundFilter;
 						stickElements[0].style.transform = stickForegroundTransform;
-						stickElements[0].style.zIndex = 0;        
+						stickElements[0].style.zIndex = zIndexSticksForeground;        
 						
 						stickLastSpawnGroupChanceX = sceneWidth;
 						stickSpawnGroupMissedChances = 0;
@@ -608,6 +642,8 @@
                     parallaxObjectsX[i][index] = sceneWidth;
                     parallaxObjectElements[i][index].style.top = MinigameRandomRange(parallaxObjectsYMin[i][index], parallaxObjectsYMax[i][index]) + "px";
                     parallaxObjectElements[i][index].style.rotate = MinigameRandomRange(parallaxObjectsRotationMin[i][index], parallaxObjectsRotationMax[i][index]) + "deg";
+                    parallaxObjectElements[i][index].style.zIndex = zIndexParallaxObject;
+
                     
 					parallaxObjectsSpeedFactor[i][index] = MinigameRandomRange(parallaxObjectsSpeedFactorMin, parallaxObjectsSpeedFactorMax);
                     parallaxObjectElements[i][index].style.display = "block";
@@ -789,7 +825,7 @@
 								stickInForeground[groupMemberIndex] = spawnInForeground;
 								stickElements[groupMemberIndex].style.filter = spawnInForeground ? stickForegroundFilter : stickBackgroundFilter;
 								stickElements[groupMemberIndex].style.transform = spawnInForeground ? stickForegroundTransform : stickBackgroundTransform;
-								stickElements[groupMemberIndex].style.zIndex = spawnInForeground ? 0 : -1;
+								stickElements[groupMemberIndex].style.zIndex = spawnInForeground ? zIndexSticksForeground : zIndexSticksBackground;
 								stickElements[groupMemberIndex].style.display = "block";
 								if(minigameSwitchNoSticks) { stickElements[groupMemberIndex].style.display = "none"; }
 							}
