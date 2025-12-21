@@ -171,6 +171,12 @@ body
 }
 */
 
+#helpText
+{
+    font-size:18px;
+	margin-top:3px;	
+}
+
 #points
 {
     display:block;

@@ -17,11 +17,12 @@
     var lmBack = 2;
     var lmWaves = 3;    
 	
-	var levelChangeDuration = 3;
+	var levelMessageDuration = 3;  
 	
 	var levelStatePlaying = 0;
-    var levelStateChanging = 1;
-	var levelStateStopped = 2;
+    var levelStateMessage = 1;
+    var levelStateWait = 2;
+	var levelStateStopped = 3;
     
 	var levelState;
 	
@@ -29,7 +30,19 @@
     
     var pointsElement;
     var messageElement;
+    var helpElement;
+        
+    var helpImageElements;
+    var helpDisplayed;
+    var helpTextElement;
+    var helpTimer;
     
+    var helpDuration = 3;
+    
+    var waitDuration = 1.5;
+    
+    var helpTexts = ["Click to jump", "Click to switch plane", "Click to go forward"];
+
     var minigameState;
     var minigameStateWelcome    = 0;
     var minigameStatePlay       = 1;
@@ -220,8 +233,29 @@
 		
         pointsElement = document.getElementById("points");
         messageElement = document.getElementById("message");
-        shipElement = document.getElementById("ship");
+        helpElement = document.getElementById("help");
         
+        helpImageElements = new Array()
+        
+        helpImageElements.push(document.getElementById("help1"));
+        helpImageElements.push(document.getElementById("help2"));
+        helpImageElements.push(document.getElementById("help3"));
+        
+        helpDisplayed = new Array();
+        
+        helpDisplayed.push(false);
+        helpDisplayed.push(false);
+        helpDisplayed.push(false);
+        
+        for(var i = 0; i < helpImageElements.length; i++)
+        {
+            helpImageElements[i].style.display = "none";
+        }
+        
+        helpTextElement = document.getElementById("helpText");
+        
+        
+        shipElement = document.getElementById("ship");
 
         stickElements = new Array();
         stickPositionsX = new Array();
@@ -287,6 +321,7 @@
         
         pointsElement.style.opacity = 0;            
         messageElement.style.opacity = 0;            
+        helpElement.style.opacity = 0;            
             
     }
     
@@ -304,6 +339,14 @@
         pointsElement.style.opacity = 1;
 		
 		messageElement.style.opacity = 0;
+        
+        
+        helpElement.style.opacity = 0;            
+        
+        for(var i = 0; i < helpDisplayed.length; i++)
+        {
+            helpDisplayed[i] = false;
+        }
 
         // Init scene 
         
@@ -491,6 +534,7 @@
         if(shipDead)
         {
             messageElement.style.opacity = 0;
+            helpElement.style.opacity = 0;
             levelState = levelStateStopped;
         }
         else if(level < levelCount - 1)
@@ -500,8 +544,8 @@
                 levelTimer -= minigameTimeStep;
                 if(levelTimer < 0)
                 {
-                    levelState = levelStateChanging;
-					levelTimer = levelChangeDuration;
+                    levelState = levelStateMessage;
+					levelTimer = levelMessageDuration;
 
 					messageElement.style.opacity = 1;
 					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
@@ -531,19 +575,52 @@
                 }
 
             }
-            else if(levelState == levelStateChanging)
+            else if(levelState == levelStateMessage)
             {
 				var levelMode = levelModes[level];
 				
                 levelTimer -= minigameTimeStep;
-				
+                
                 if(((levelMode == lmBack || levelMode == lmJump) && stickLastSpawnGroupChanceX < -stickWidth ||
 				     levelMode == lmWaves || levelMode == lmNull) && levelTimer <= 0)
-                {
+                {                   
 					messageElement.style.opacity = 0;
+                    
+                    levelState = levelStateWait;
+                    
+                    levelTimer = waitDuration;
+                }
+            }
+            else if(levelState == levelStateWait)
+            {
+                var helpIndex = levelModes[level + 1] - lmJump;
+                var helpRequired = (levelModes[level + 1] >= lmJump && levelModes[level + 1] <= lmWaves && !helpDisplayed[helpIndex]);
+
+                if(!helpRequired) { levelTimer = 0; }
+                
+                levelTimer -= minigameTimeStep;
+                
+                if(levelTimer <= 0)
+                {                   
                     levelState = levelStatePlaying;
                     levelTimer = levelDuration[level + 1];
                     sceneTargetSpeedX = levelSpeedX[level + 1];
+                    
+                    if(levelModes[level + 1] >= lmJump && levelModes[level + 1] <= lmWaves && !helpDisplayed[helpIndex])
+                    {
+                        for(var i = 0; i < helpImageElements.length; i++)
+                        {
+                            helpImageElements[i].style.display = "none";
+                        }
+                    
+                        helpImageElements[helpIndex].style.display = "inline";
+                        helpTextElement.innerHTML = helpTexts[helpIndex];
+                        helpTimer = helpDuration;
+                        
+                        helpElement.style.opacity = 1;
+
+                        helpDisplayed[helpIndex] = true;
+                    }                          
 					
 					if(levelModes[level + 1] == lmJump || levelModes[level + 1] == lmBack)
 					{
@@ -609,6 +686,18 @@
                               Math.abs(sceneSpeedX) * minigameTimeStep;
                               
             pointsElement.innerHTML = Math.floor(minigamePoints / 10) * 10;
+        }
+        
+        // Update help
+        
+        if(helpTimer > 0)
+        {
+            helpTimer -= minigameTimeStep;
+            
+            if(helpTimer <= 0)
+            {
+                helpElement.style.opacity = 0;
+            }
         }
         
         // Update scene
