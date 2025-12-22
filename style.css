@@ -171,6 +171,14 @@ body
 }
 */
 
+#hope
+{
+    display:block;
+    position:absolute;
+    left:347px;
+    top:39px;
+}
+
 #helpText
 {
     font-size:18px;
