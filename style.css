@@ -84,7 +84,7 @@ body
     z-index:0;
 }
 
-#vignette
+#vignette, #fader
 {
 	display:block;
     width:900px;
@@ -151,6 +151,7 @@ body
 	transition: rotate 0.15s ease-in-out;    
     transition: filter 0.15s ease-in-out;  
     transition: transform 0.15s ease-in-out;
+	transition: opacity 0.5s ease-in-out;
 }
 
 .stick
@@ -241,7 +242,7 @@ body
     font-size:21px;
 }
 
-#minigame, #vignette
+#minigame, #vignette, #fader
 {
     border-radius:20px 20px 0px 0px;    
 }
@@ -291,6 +292,11 @@ body
 {
 	font-size:16px;
 	margin-top:10px;	
+}
+
+#fader
+{
+	opacity:0.4;
 }
 
 #minigame

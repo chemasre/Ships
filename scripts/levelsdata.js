@@ -49,7 +49,7 @@
 	
     var levelModes                           = [ _null  , _jump  ,  _end  , _wave  , _back  , _jump , _back , _null , _null , _null , _null , _null , _null , _null , _null ];
     var levelDuration                        = [     2  ,     5  ,    20  ,    20  ,    20  ,   20  ,    20 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     2 ];
-    var levelSpeedX                          = [  -100  ,  -400  ,  -400  ,  -500  ,  -500  , -700  ,  -700 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ];
+    var levelSpeedX                          = [  -100  ,  -400  ,  -100  ,  -500  ,  -500  , -700  ,  -700 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ];
     var levelStickSpawnGroupSeparation       = [     0  ,   300  ,   300  ,   400  ,   400  ,  500  ,   500 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
     var levelStickSpawnGroupChances          = [     0  ,     2  ,     2  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
     var levelStickSpawnGroupMaxMembers       = [     0  ,     1  ,     1  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];

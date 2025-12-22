@@ -222,21 +222,41 @@
     // Ending
     
     var endingHopeElement;
-    var endingLetterElement;
+	var endingHopePositionX;
+	var endingHopePositionXLeft = 347;
+	var endingHopePositionXRight = 900;
+	var endingHopeDone = false;
+	var endingShipSpeedX = 150;
+	var endingShipPositionXRight = 327;
+	var endingLetterElement;	
+    var endingLetterPositionY;
     var endingLetterPositionYLow = 236;
-    var endingLettePositionYHigh = -440;
-    var endingLetterSpeed;
+    var endingLetterPositionYHigh = -440;
+    var endingLetterSpeed = -20;
+	var endingLetterDone = false;
+
+    var endingLetterWait = 3;
+	var endingLetterWaitDone = false;
+
+	var endingLetterFadeDuration = 1.0;
+	var endingLetterFadeDone = false;
     var endingHopeHandPositionX;
     
     var endingStateHope = 0;
-    var endingStateLetter = 1;
-    var endingStateDone = 2;
+	var endingStateShip = 1;
+    var endingStateLetter = 2;
+    var endingStateDone = 3;
     
     var endingState;
     
     var endingTimer;
-    var endingHopeDuration = 2;
-    var endingLetterDuration = 2;
+	
+	// Fader
+	
+	var faderElement;
+	var fadeTimer;
+	var fadeOpacity = 0.5;
+	var fadeDuration = 0.5;
     
     var shipElement;
     
@@ -412,6 +432,7 @@
         // Start ship
         
         shipElement.style.display = "block";
+		shipElement.style.opacity = 1;
         
         shipPosX = shipStartPosX;
         shipPosY = shipStartPosY;
@@ -463,6 +484,7 @@
         endingLetterElement.style.display = "block";
         endingLetterElement.style.opacity = 0;
         
+		
 		ApplyCSSChangesNow();
         
     
@@ -724,14 +746,18 @@
                         // Enter ending
                         
                         endingState = endingStateHope;
-                        endingTimer = endingHopeDuration;
         
                         endingHopeElement.style.display = "block";
                         endingHopeElement.style.opacity = 1;
-                        
-                        pointsElement.style.opacity = 0;
-                        
-                        sceneTargetSpeedX = 0;
+												
+						endingHopePositionX = endingHopePositionXRight;
+						endingHopeElement.style.left = endingHopePositionX + "px";
+						
+						endingHopeDone = false;
+						endingLetterDone = false;
+						endingLetterWaitDone = false;
+						
+                        pointsElement.style.opacity = 0;                        
                         
                     }
 					
@@ -1104,32 +1130,95 @@
         if(levelModes[level] == lmEnding)
         {
             if(endingState == endingStateHope)
-            {                
-                endingTimer -= minigameTimeStep;
+            {          
 
-                if(endingTimer <= 0)
-                {
-                    endingHopeElement.style.opacity = 0;
-                    
-                    endingLetterElement.style.display = "block";
-                    endingLetterElement.style.opacity = 1;
+				if(!endingHopeDone)
+				{
+					endingHopePositionX += sceneSpeedX * minigameTimeStep;
+					
+					if(endingHopePositionX <= endingHopePositionXLeft)
+					{
+						endingHopePositionX = endingHopePositionXLeft;
+						sceneSpeedX = 0;
+						sceneTargetSpeedX = 0;
+						endingHopeDone = true;
+					}
+					
+					endingHopeElement.style.left = endingHopePositionX + "px";
+				}
+				else
+				{
+					shipPosX += endingShipSpeedX * minigameTimeStep;
+					
+					if(shipPosX >= endingShipPositionXRight)
+					{
+						shipPosX = endingShipPositionXRight;
+						
+						endingHopeElement.style.opacity = 0;
+						shipElement.style.opacity = 0;
+						
+						endingLetterElement.style.display = "block";
+						endingLetterPositionY = endingLetterPositionYLow;
+						endingLetterElement.style.top = endingLetterPositionY + "px";
+						endingLetterElement.style.opacity = 1;
+						
+						endingState = endingStateLetter;
+						
+					}
+				}
+				
 
-                    endingState = endingStateLetter;
-                    endingTimer = endingLetterDuration;
-                }
+		
             }
             else if(endingState == endingStateLetter)
             {
-                endingTimer -= minigameTimeStep;
+				if(!endingLetterDone)
+				{
+					endingLetterPositionY += endingLetterSpeed * minigameTimeStep;
 
-                if(endingTimer <= 0)
-                {          
-                    endingLetterElement.style.opacity = 0;
-                    endingState = endingStateDone;
-                    
-                    minigameState = minigameStateGameOver;
-                    MinigameEnterGameOver();                    
-                }
+					if(endingLetterPositionY <= endingLetterPositionYHigh)
+					{
+						endingLetterPositionY = endingLetterPositionYHigh;
+						endingTimer = endingLetterWait;
+						endingLetterDone = true;
+					}
+					
+					endingLetterElement.style.top = endingLetterPositionY + "px";
+				}
+				else if(!endingLetterWaitDone)
+				{
+					endingTimer -= minigameTimeStep;
+
+					if(endingTimer <= 0)
+					{       
+						endingLetterElement.style.opacity = 0;
+
+						endingTimer = endingLetterFadeDuration;
+						endingLetterWaitDone = true;						
+					}
+				}
+				else if(!endingLetterFadeDone)
+				{
+					endingTimer -= minigameTimeStep;
+
+					if(endingTimer <= 0)
+					{       
+						endingLetterFadeDone = true;						
+					}
+				}
+				else
+				{
+					endingState = endingStateDone;
+					
+					MinigameExitPlay();                    
+					minigameState = minigameStateWelcome;
+					MinigameEnterWelcome();
+					
+					//minigameState = minigameStateGameOver;
+					//MinigameEnterGameOver();                    
+					
+				}
+				
             }
         }
         
@@ -1157,6 +1246,8 @@
     
     function MinigameEnterWelcome()
     {  
+		MinigameStartFade();
+	
 		welcomeStartBlinkOn = true;
 		welcomeStartBlinkTimer = menuBlinkInterval;
 	
@@ -1175,6 +1266,11 @@
         welcomeStart.style.opacity = 1;
         
         welcomeDisclaimer.style.opacity = 0.6;
+		
+		shipElement.style.display = "block";
+        shipElement.style.rotate = "0deg";
+		shipElement.style.opacity = 1;
+		shipElement.style.left = shipStartPosX + "px";
     }
     
     function MinigameFinishWelcome()
@@ -1237,10 +1333,7 @@
         gameOverRestart.style.opacity = 0;
 		
 		console.log("Entering game over");
-        
-        if(levelModes[level] == lmEnding) { gameOverText.innerHTML = "You didn't give up"; }
-        else { gameOverText.innerHTML = "Don't give up"; }
-        
+                
         gameOverRestartTimer = gameOverRestartDelay;
                              
     
@@ -1278,6 +1371,7 @@
                     MinigameExitPlay();
                     MinigameExitGameOver();
                     minigameState = minigameStatePlay;
+					MinigameStartFade();					
                     MinigameEnterPlay();
                     console.log("Going to play");
                 }
@@ -1315,6 +1409,10 @@
         }
 
         soundIsPlaying = false;
+		
+		faderElement = document.getElementById("fader");
+		faderElement.style.opacity = 0;
+		faderElement.style.display = "none";
         
         MinigameInitPlay();        
         MinigameInitWelcome();
@@ -1341,6 +1439,17 @@
    
     function MinigameUpdate()
     {
+
+		if(fadeTimer > 0)
+		{
+			fadeTimer -= minigameTimeStep;			
+			faderElement.style.opacity = (fadeTimer / fadeDuration) * fadeOpacity;			
+		}
+		else
+		{
+			faderElement.style.display = "none";
+		}
+		
         if(minigameState == minigameStateWelcome)
         {
             MinigameUpdateWelcome();  
@@ -1409,4 +1518,11 @@
 		
 		return r;
 		
+	}
+	
+	function MinigameStartFade()
+	{
+		fadeTimer = fadeDuration;
+		faderElement.style.display = "block";
+		faderElement.style.opacity = fadeOpacity;
 	}
