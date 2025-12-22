@@ -171,12 +171,25 @@ body
 }
 */
 
+#hope, #letter
+{
+    transition: opacity 1s ease-in-out;
+}
+
 #hope
 {
     display:block;
     position:absolute;
     left:347px;
     top:39px;
+}
+
+#letter
+{
+    display:block;
+    position:absolute;
+    left:0px;
+    top:0px;
 }
 
 #helpText

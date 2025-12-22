@@ -15,7 +15,8 @@
     var lmNull = 0;
     var lmJump = 1;
     var lmBack = 2;
-    var lmWaves = 3;    
+    var lmWaves = 3;
+    var lmEnding = 4;
 	
 	var levelMessageDuration = 3;  
 	
@@ -217,6 +218,25 @@
 	var wavesSpeed = 10;
 	var wavesChangeTimer = 2;
     
+    // Ending
+    
+    var endingHopeElement;
+    var endingLetterElement;
+    var endingLetterPositionYLow = 236;
+    var endingLettePositionYHigh = -440;
+    var endingLetterSpeed;
+    var endingHopeHandPositionX;
+    
+    var endingStateHope = 0;
+    var endingStateLetter = 1;
+    var endingStateDone = 2;
+    
+    var endingState;
+    
+    var endingTimer;
+    var endingHopeDuration = 2;
+    var endingLetterDuration = 2;
+    
     var shipElement;
     
     ////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +250,8 @@
 		
 		if(storedRecord != null) { minigameRecordPoints = parseInt(storedRecord); minigameRecordExists = true; }
 		else { minigameRecordPoints = 0; minigameRecordExists = false; }
-		
+        
+	
         pointsElement = document.getElementById("points");
         messageElement = document.getElementById("message");
         helpElement = document.getElementById("help");
@@ -255,6 +276,8 @@
         helpTextElement = document.getElementById("helpText");
         
         
+        // Init sticks
+
         shipElement = document.getElementById("ship");
 
         stickElements = new Array();
@@ -302,6 +325,7 @@
             }
         }
         
+        // Init waves
         
         waveElements = new Array();
         waveAnimationTimers = new Array();
@@ -319,6 +343,17 @@
             }
         }
         
+        // Init ending 
+        
+        endingHopeElement = document.getElementById("hope");
+        endingLetterElement = document.getElementById("letter");
+        
+        endingHopeElement.style.display = "none";
+        endingHopeElement.style.opacity = 0;
+
+        endingLetterElement.style.display = "none";
+        endingLetterElement.style.opacity = 0;
+        
         pointsElement.style.opacity = 0;            
         messageElement.style.opacity = 0;            
         helpElement.style.opacity = 0;            
@@ -327,7 +362,7 @@
     
     function MinigameEnterPlay()
     {
-        // Init minigame
+        // Start minigame
         
         level = 0;
         levelTimer = levelDuration[0];
@@ -348,17 +383,17 @@
             helpDisplayed[i] = false;
         }
 
-        // Init scene 
+        // Start scene 
         
         sceneSpeedX = 0;
         sceneTargetSpeedX = levelSpeedX[0];        
         
-        // Init Glow
+        // Start Glow
         
         glowForegroundElement.style.opacity = levelGlowForeground[0];
         glowBackgroundElement.style.opacity = levelGlowBackground[0];
         
-        // Init parallax
+        // Start parallax
         
         
         for(var i = 0; i < parallaxNumPlanes; i++)
@@ -373,7 +408,7 @@
             }
         }
 
-        // Init ship
+        // Start ship
         
         shipElement.style.display = "block";
         
@@ -391,7 +426,7 @@
 
         shipDead = false;
 
-        // Init sticks
+        // Start sticks
         
         for(var i = 0; i < numSticks; i++)
         {
@@ -407,7 +442,7 @@
             
         }       
         
-        // Init waves
+        // Start waves
 
         for(var i = 0; i < numWaves; i++)
         {
@@ -418,6 +453,14 @@
 				waveElements[i][j].style.transform = "scale(0%)";
             }
         }
+        
+        // Start ending
+        
+        endingHopeElement.style.display = "block";
+        endingHopeElement.style.opacity = 0;
+
+        endingLetterElement.style.display = "block";
+        endingLetterElement.style.opacity = 0;
         
 		ApplyCSSChangesNow();
         
@@ -452,7 +495,7 @@
 			
 		}
 
-		// Finish waves
+		// Exit waves
 		
 		for(var i = 0; i < numWaves; i++)
         {
@@ -465,6 +508,14 @@
         
         glowForegroundElement.style.opacity = 0;
         glowBackgroundElement.style.opacity = 0;
+        
+        // Exit ending
+        
+        endingHopeElement.style.display = "none";
+        endingHopeElement.style.opacity = 0;
+
+        endingLetterElement.style.display = "none";
+        endingLetterElement.style.opacity = 0;        
 	
 		ApplyCSSChangesNow();
     }
@@ -667,6 +718,21 @@
 						}
 
 					}
+                    else if(levelModes[level + 1] == lmEnding)
+                    {
+                        // Enter ending
+                        
+                        endingState = endingStateHope;
+                        endingTimer = endingHopeDuration;
+        
+                        endingHopeElement.style.display = "block";
+                        endingHopeElement.style.opacity = 1;
+                        
+                        pointsElement.style.opacity = 0;
+                        
+                        sceneTargetSpeedX = 0;
+                        
+                    }
 					
                     level ++;
                     
@@ -1032,6 +1098,40 @@
 			}
 		}
 		
+        // Update ending
+        
+        if(levelModes[level] == lmEnding)
+        {
+            if(endingState == endingStateHope)
+            {                
+                endingTimer -= minigameTimeStep;
+
+                if(endingTimer <= 0)
+                {
+                    endingHopeElement.style.opacity = 0;
+                    
+                    endingLetterElement.style.display = "block";
+                    endingLetterElement.style.opacity = 1;
+
+                    endingState = endingStateLetter;
+                    endingTimer = endingLetterDuration;
+                }
+            }
+            else if(endingState == endingStateLetter)
+            {
+                endingTimer -= minigameTimeStep;
+
+                if(endingTimer <= 0)
+                {          
+                    endingLetterElement.style.opacity = 0;
+                    endingState = endingStateDone;
+                    
+                    minigameState = minigameStateGameOver;
+                    MinigameEnterGameOver();                    
+                }
+            }
+        }
+        
     
     }    
 
@@ -1111,6 +1211,7 @@
     {
         gameOverElement = document.getElementById("gameOver");
         gameOverScore = document.getElementById("gameOverScore");
+        gameOverText = document.getElementById("gameOverText");
         gameOverRestart = document.getElementById("gameOverRestart");
         gameOverElement.style.opacity = 0;
         gameOverRestart.style.opacity = 0;
@@ -1130,6 +1231,9 @@
 		
 		console.log("Entering game over");
         
+        if(levelModes[level] == lmEnding) { gameOverText.innerHTML = "You didn't give up"; }
+        else { gameOverText.innerHTML = "Don't give up"; }
+        
         gameOverRestartTimer = gameOverRestartDelay;
                              
     
@@ -1144,7 +1248,7 @@
     
     function MinigameUpdateGameOver()
     {
-        if(shipPosY > sceneHeight)
+        if(levelModes[level] == lmEnding || shipPosY > sceneHeight)
         {
             shipElement.style.rotate = "0deg";
 			
