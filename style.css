@@ -26,11 +26,35 @@ body
 	/* text */
 	
 	background-color:rgb(27,69,65);
+    background-image:url('images/web-background.png');
 	font-family: helvetica, arial, sans-serif;
 	
 	overflow:hidden;
 	
 	
+}
+
+#welcomeDisclaimer
+{
+    position:absolute;
+    left:450px;
+    top:240px;
+    
+    transition: opacity 0.5s ease-in-out;
+    
+    transform:translate(-50%, 0%);
+    
+	text-shadow: 0 0 10px #fff;
+
+    font-style:italic;
+    font-family:serif;
+    font-size:50px;
+    color:rgb(255,255,229);
+    text-align:center;
+    
+    opacity:0.5;
+
+    font-size:14px;
 }
 
 

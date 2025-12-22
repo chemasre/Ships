@@ -50,7 +50,7 @@
     var minigameStateGameOver   = 2;
 	
     var minigameSwitchFastForward = true;
-    var minigameSwitchNoDamage = true;
+    var minigameSwitchNoDamage = false;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
     
@@ -77,6 +77,7 @@
     var welcomeElement;
 	var welcomeScore;
 	var welcomeStart;
+    var welcomeDisclaimer;
 	var welcomeStartBlinkOn;
 	var welcomeStartBlinkTimer;
 	
@@ -582,7 +583,7 @@
     {
         // Update level
         
-        if(shipDead)
+        if(shipDead || levelModes[level] == lmEnding)
         {
             messageElement.style.opacity = 0;
             helpElement.style.opacity = 0;
@@ -1149,6 +1150,9 @@
 
 		welcomeStart = document.getElementById("welcomeStart");
 		welcomeStart.style.opacity = 0;
+
+		welcomeDisclaimer = document.getElementById("welcomeDisclaimer");
+        welcomeDisclaimer.style.opacity = 0;
     }
     
     function MinigameEnterWelcome()
@@ -1169,11 +1173,14 @@
 		}
         
         welcomeStart.style.opacity = 1;
+        
+        welcomeDisclaimer.style.opacity = 0.6;
     }
     
     function MinigameFinishWelcome()
     {
         welcomeElement.style.opacity = 0;
+        welcomeDisclaimer.style.opacity = 0;
         console.log("Finishing welcome");
     }
     
