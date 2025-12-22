@@ -91,12 +91,16 @@
     // Sound
     
     var soundIsPlaying;
-    var soundAmbientMusicVolume = 0.3;
+    var soundAmbientMusicVolume = 0;
+    var soundAmbientMusicTargetVolume;
     var soundAmbientMusicElement;
     var soundJumpVolume = 0.15;
     var soundJumpElement;    
     var soundAmbientVolume = 1;
+    var soundAmbientTargetVolume;
     var soundAmbientElement;
+    
+    var soundVolumeChangeSpeed = 0.2;    
     
     // Scene
     
@@ -414,6 +418,11 @@
         glowForegroundElement.style.opacity = levelGlowForeground[0];
         glowBackgroundElement.style.opacity = levelGlowBackground[0];
         
+        // Start music
+        
+        soundAmbientMusicTargetVolume = levelAmbientMusicVolume[0];
+        soundAmbientTargetVolume = levelAmbientSoundVolume[0];
+        
         // Start parallax
         
         
@@ -626,6 +635,8 @@
 
                     glowForegroundElement.style.opacity = levelGlowForeground[level + 1];
                     glowBackgroundElement.style.opacity = levelGlowBackground[level + 1];
+                    soundAmbientMusicTargetVolume = levelAmbientMusicVolume[level + 1];
+                    soundAmbientTargetVolume = levelAmbientSoundVolume[level + 1];
 
                     console.log("Changing level");
 					
@@ -1395,11 +1406,11 @@
 		if(minigameSwitchNoSound) { soundJumpElement.volume = 0; }
 
         soundAmbientMusicElement = document.getElementById("ambientMusic");
-        soundAmbientMusicElement.volume = soundAmbientMusicVolume;
+        soundAmbientMusicElement.volume = 0;
         soundAmbientMusicElement.loop = true;
 
         soundAmbientElement = document.getElementById("ambientSound");
-        soundAmbientElement.volume = soundAmbientVolume;
+        soundAmbientElement.volume = 1;
         soundAmbientElement.loop = true;
 
 		if(minigameSwitchNoSound)
@@ -1439,6 +1450,48 @@
    
     function MinigameUpdate()
     {
+        
+        if(soundIsPlaying)
+        {
+            if(soundAmbientMusicVolume < soundAmbientMusicTargetVolume)
+            {
+                soundAmbientMusicVolume += soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientMusicVolume >= soundAmbientMusicTargetVolume)
+                {
+                    soundAmbientMusicVolume = soundAmbientMusicTargetVolume;
+                }
+            }
+            else if(soundAmbientMusicVolume > soundAmbientMusicTargetVolume)
+            {
+                soundAmbientMusicVolume -= soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientMusicVolume <= soundAmbientMusicTargetVolume)
+                {
+                    soundAmbientMusicVolume = soundAmbientMusicTargetVolume;
+                }
+            }
+            
+            if(soundAmbientVolume < soundAmbientTargetVolume)
+            {
+                soundAmbientVolume += soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientVolume >= soundAmbientTargetVolume)
+                {
+                    soundAmbientVolume = soundAmbientTargetVolume;
+                }
+            }
+            else if(soundAmbientVolume > soundAmbientTargetVolume)
+            {
+                soundAmbientVolume -= soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientVolume <= soundAmbientTargetVolume)
+                {
+                    soundAmbientVolume = soundAmbientTargetVolume;
+                }
+            }            
+            
+            
+            console.log("v1 " + soundAmbientMusicVolume + " v2 " + soundAmbientVolume);
+            soundAmbientMusicElement.volume = soundAmbientMusicVolume;
+            soundAmbientElement.volume = soundAmbientVolume;
+        }
 
 		if(fadeTimer > 0)
 		{

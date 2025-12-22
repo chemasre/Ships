@@ -64,8 +64,10 @@
 	var levelWavesSpeedMax			         = [     0  ,     0  ,     0  ,   100  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
 	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     0  ,     1  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
 	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     0  ,     3  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelGlowBackground                  = [     0  ,   0.3  ,   0.3  ,   0.3  ,   0.3  ,   0.3 ,   0.3 ,   0.3 ,   0.3  ,  0.3  ,  0.3 ,   0.3 ,   0.3 ,   0.3 ,   0.3 ];
+	var levelGlowBackground                  = [     0  ,   0.3  ,   0.9  ,   0.3  ,   0.3  ,   0.3 ,   0.3 ,   0.3 ,   0.3  ,  0.3  ,  0.3 ,   0.3 ,   0.3 ,   0.3 ,   0.3 ];
     var levelGlowForeground                  = [     0  ,  0.04  ,  0.04  ,  0.04  ,  0.04  ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ];
+    var levelAmbientMusicVolume              = [     0  ,  0.10  ,  0.30  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
+    var levelAmbientSoundVolume              = [   0.3  ,  0.30  ,  0.10  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
 
 
 		// "oh yes! they float, Georgie.",
