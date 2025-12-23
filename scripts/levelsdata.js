@@ -1,4 +1,4 @@
-    var levelCount = 14;
+    var levelCount = 15;
 	
 	var _null = 0;
 	var _jump = 1;
@@ -9,11 +9,12 @@
 	var levelMessages =
 	[
 		"",
-        "Even small actions can have purpose",
-        "See? You have reached this point",
-        "Sometimes we become sailors of the mist",
-        "We move forward, yet time has frozen for us",
-        "We move forward, yet we look back",
+        "Even small actions can have purpose<br>You served the tea, and now we can talk",
+        "It's serving the tea more important than what we say?<br>Doesn't everything serves to the same purpose?",
+        "Don't laugh at... Oh! You never listen.",
+        
+        "Mom says I shouldn't come to the shore",
+        "That I cannot live looking back We move forward, yet we look back",
         "We see no purpose, yet we go through",
         "But even small actions can have purpose",
         "See? You have reached this point",
@@ -44,30 +45,32 @@
 		"4:",
 		"3:",
 	];
-	
+
 	// SpawnGroupChances  1 -> 100%  2-> 50%  3-> 33% ...
-	
-    var levelModes                           = [ _null  , _jump  ,  _end  , _wave  , _back  , _jump , _back , _null , _null , _null , _null , _null , _null , _null , _null ];
-    var levelDuration                        = [     2  ,     5  ,    20  ,    20  ,    20  ,   20  ,    20 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     2 ];
-    var levelSpeedX                          = [  -100  ,  -400  ,  -100  ,  -500  ,  -500  , -700  ,  -700 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ];
-    var levelStickSpawnGroupSeparation       = [     0  ,   300  ,   300  ,   400  ,   400  ,  500  ,   500 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-    var levelStickSpawnGroupChances          = [     0  ,     2  ,     2  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-    var levelStickSpawnGroupMaxMembers       = [     0  ,     1  ,     1  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-    var levelStickSpawnGroupMemberSeparation = [     0  ,    80  ,    80  ,     0  ,    80  ,   80  ,    80 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];    
-    var levelStickTopPosY                    = [     0  ,   290  ,   290  ,     0  ,   280  ,  270  ,   270 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesSpeed						 = [     0  ,     0  ,     0  ,    30  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesSeparationMin			     = [     0  ,     0  ,     0  ,   250  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesSeparationMax			     = [     0  ,     0  ,     0  ,   600  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesPositionXMin			     = [     0  ,     0  ,     0  ,  -300  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesPositionXMax			     = [     0  ,     0  ,     0  ,   300  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesSpeedMin			         = [     0  ,     0  ,     0  ,    50  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesSpeedMax			         = [     0  ,     0  ,     0  ,   100  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     0  ,     1  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     0  ,     3  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-	var levelGlowBackground                  = [     0  ,   0.3  ,   0.9  ,   0.3  ,   0.3  ,   0.3 ,   0.3 ,   0.3 ,   0.3  ,  0.3  ,  0.3 ,   0.3 ,   0.3 ,   0.3 ,   0.3 ];
-    var levelGlowForeground                  = [     0  ,  0.04  ,  0.04  ,  0.04  ,  0.04  ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ];
-    var levelAmbientMusicVolume              = [     0  ,  0.10  ,  0.30  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
-    var levelAmbientSoundVolume              = [   0.3  ,  0.30  ,  0.10  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ];
+
+    //                                            0         1        2        3        4      5        6       7      8       9       10      11      12      13      14 
+    var levelModes                           = [ _null  , _jump  , _wave  , _back  , _jump , _back , _null , _null , _null , _null , _null , _null , _null , _null,  _end   ];
+    var levelDuration                        = [     2  ,     5  ,    20  ,    20  ,   20  ,    20 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     2,    20   ];
+    var levelMessageDurations                = [     3  ,     6  ,     6  ,     3  ,    3  ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3,     3   ];
+    var levelSpeedX                          = [  -100  ,  -400  ,  -500  ,  -500  , -700  ,  -700 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100,  -100   ];
+    var levelStickSpawnGroupSeparation       = [     0  ,   300  ,   400  ,   400  ,  500  ,   500 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,   300   ];
+    var levelStickSpawnGroupChances          = [     0  ,     2  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     2   ];
+    var levelStickSpawnGroupMaxMembers       = [     0  ,     1  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     1   ];
+    var levelStickSpawnGroupMemberSeparation = [     0  ,    80  ,     0  ,    80  ,   80  ,    80 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,    80   ];
+    var levelStickTopPosY                    = [     0  ,   290  ,     0  ,   280  ,  270  ,   270 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,   290   ];
+	var levelWavesSpeed						 = [     0  ,     0  ,    30  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesSeparationMin			     = [     0  ,     0  ,   250  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesSeparationMax			     = [     0  ,     0  ,   600  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesPositionXMin			     = [     0  ,     0  ,  -300  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesPositionXMax			     = [     0  ,     0  ,   300  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesSpeedMin			         = [     0  ,     0  ,    50  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesSpeedMax			         = [     0  ,     0  ,   100  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     1  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     3  ,     0  ,    0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     0   ];
+	var levelGlowBackground                  = [     0  ,   0.3  ,   0.3  ,   0.3  ,   0.3 ,   0.3 ,   0.3 ,   0.3  ,  0.3  ,  0.3 ,   0.3 ,   0.3 ,   0.3 ,   0.3,   0.9   ];
+    var levelGlowForeground                  = [     0  ,  0.04  ,  0.04  ,  0.04  ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04 ,  0.04,  0.04   ];
+    var levelAmbientMusicVolume              = [     0  ,  0.10  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,  0.30   ];
+    var levelAmbientSoundVolume              = [   0.3  ,  0.30  ,     0  ,     0  ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,  0.10   ];
 
 
 		// "oh yes! they float, Georgie.",

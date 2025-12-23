@@ -18,8 +18,6 @@
     var lmWaves = 3;
     var lmEnding = 4;
 	
-	var levelMessageDuration = 3;  
-	
 	var levelStatePlaying = 0;
     var levelStateMessage = 1;
     var levelStateWait = 2;
@@ -50,7 +48,7 @@
     var minigameStateGameOver   = 2;
 	
     var minigameSwitchFastForward = true;
-    var minigameSwitchNoDamage = false;
+    var minigameSwitchNoDamage = true;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;
     
@@ -628,7 +626,7 @@
                 if(levelTimer < 0)
                 {
                     levelState = levelStateMessage;
-					levelTimer = levelMessageDuration;
+					levelTimer = levelMessageDurations[level + 1];
 
 					messageElement.style.opacity = 1;
 					messageElement.innerHTML = "<div style='font-size:30px'>" + levelMessages[level + 1] + "</div>"
