@@ -235,7 +235,7 @@
 	var endingLetterElement;	
     var endingLetterPositionY;
     var endingLetterPositionYLow = 236;
-    var endingLetterPositionYHigh = -440;
+    var endingLetterPositionYHigh = -360;
     var endingLetterSpeed = -20;
 	var endingLetterDone = false;
 
