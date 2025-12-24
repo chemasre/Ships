@@ -46,15 +46,9 @@
     var minigameStateWelcome    = 0;
     var minigameStatePlay       = 1;
     var minigameStateGameOver   = 2;
-	
-    var minigameSwitchFastForward = true;
-    var minigameSwitchNoDamage = true;
-	var minigameSwitchNoSticks = false;
-	var minigameSwitchNoSound = false;
-    
+	    
     var minigameSwitchFastForwardPressed;
     var minigameSwitchFastForwardSavedTimeStep;
-    var minigameSwitchFastForwardMultiplier = 3;
     
     var zIndexParallaxObject = -2;
     var zIndexShipForeground = 0;
@@ -189,6 +183,10 @@
     var stickForegroundTransform = "translate(0%, 0%)";
     var stickBackgroundFilter = "sepia(10%) saturate(30%) brightness(80%) hue-rotate(50deg)";
     var stickBackgroundTransform = "translate(5%, 5%) scale(98%)";
+
+	var stickSpawnBackgroundSerieIsForeground;
+	var stickSpawnBackgroundSerieCount;
+
 
     var stickLastSpawnGroupChanceX;
     var stickSpawnGroupMissedChances;
@@ -624,7 +622,12 @@
             {
                 levelTimer -= minigameTimeStep;
                 if(levelTimer < 0)
-                {
+                {	
+					if(level == 0 && minigameSwitchStartAtLevel)
+					{
+						level = minigameSwitchStartLevel - 1;
+					}
+					
                     levelState = levelStateMessage;
 					levelTimer = levelMessageDurations[level + 1];
 
@@ -720,6 +723,9 @@
 						
 						stickLastSpawnGroupChanceX = sceneWidth;
 						stickSpawnGroupMissedChances = 0;
+						
+						stickSpawnBackgroundSerieIsForeground = false;
+						stickSpawnBackgroundSerieCount = 0;
 		
 					}					
 					else if(levelModes[level + 1] == lmWaves)
@@ -934,7 +940,7 @@
 			}
         }
         
-		if(!shipDead && !minigameSwitchNoDamage)
+		if(!shipDead && (!minigameSwitchNoDamage && !(minigameSwitchFastForward && minigameSwitchFastForwardPressed)))
 		{
 			var shipCollided = false;
 			
@@ -997,7 +1003,35 @@
 				{
 					if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
 					{
-						var spawnInForeground = isBackgroundMode ? (MinigameRandomRangeInt(0, 2) == 0) : true;
+						var spawnInForeground;
+						
+						if(isBackgroundMode)
+						{
+							spawnInForeground = (MinigameRandomRangeInt(0, 2) == 0);
+							
+							
+							if(spawnInForeground == stickSpawnBackgroundSerieIsForeground)
+							{
+								stickSpawnBackgroundSerieCount ++;
+								
+								if(stickSpawnBackgroundSerieCount >= levelStickSpawnBackgroundMaxSerie[level])
+								{
+									spawnInForeground = !spawnInForeground;
+									stickSpawnBackgroundSerieCount = 0;
+								}
+							}
+							else
+							{
+								stickSpawnBackgroundSerieCount = 0;
+							}							
+
+							stickSpawnBackgroundSerieIsForeground = spawnInForeground;					
+						}
+						else
+						{
+							spawnInforeground = true;
+						}
+						
 						
 						stickElements[spawnableIndex].style.display = "block";
 						if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
@@ -1486,7 +1520,6 @@
             }            
             
             
-            console.log("v1 " + soundAmbientMusicVolume + " v2 " + soundAmbientVolume);
             soundAmbientMusicElement.volume = soundAmbientMusicVolume;
             soundAmbientElement.volume = soundAmbientVolume;
         }
