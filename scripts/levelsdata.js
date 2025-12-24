@@ -9,11 +9,17 @@
 	var levelMessages =
 	[
 		"",
-        "Even small actions can have purpose<br>You served the tea, and now we can talk",
-        "It's serving the tea more important than what we say?<br>Doesn't everything serves to the same purpose?",
-        "Don't laugh at... Oh! You never listen.",
+        "\"Even small actions can have purpose.\"",
+        "\"You served the tea, and now we can talk.\"",
+        "\"It's serving the tea less important than our words?\"",
+        "\"Doesn't both serve to the same purpose?\"",
+        "\"Don't laugh at... Oh! You never listen.\"",
         
-        "Mom says I shouldn't come to the shore",
+        "\"I feel like nothing changes\"",
+        "\"Yet time keeps moving me forward\"",
+        "\"I keep looking back\"",
+        "\"\"",
+        
         "That I cannot live looking back We move forward, yet we look back",
         "We see no purpose, yet we go through",
         "But even small actions can have purpose",
@@ -51,7 +57,7 @@
     //                                            0         1        2        3        4      5        6       7      8       9       10      11      12      13      14 
     var levelModes                           = [ _null  , _jump  , _wave  , _back  , _jump , _back , _null , _null , _null , _null , _null , _null , _null , _null,  _end   ];
     var levelDuration                        = [     2  ,     5  ,    20  ,    20  ,   20  ,    20 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     5 ,     2,    20   ];
-    var levelMessageDurations                = [     3  ,     6  ,     6  ,     3  ,    3  ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3,     3   ];
+    var levelMessageDurations                = [     3  ,     3  ,     3  ,     3  ,    3  ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3 ,     3,     3   ];
     var levelSpeedX                          = [  -100  ,  -400  ,  -500  ,  -500  , -700  ,  -700 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100 ,  -100,  -100   ];
     var levelStickSpawnGroupSeparation       = [     0  ,   300  ,   400  ,   400  ,  500  ,   500 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,   300   ];
     var levelStickSpawnGroupChances          = [     0  ,     2  ,     0  ,     3  ,    4  ,     4 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0 ,     0,     2   ];
