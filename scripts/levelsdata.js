@@ -80,6 +80,10 @@
 	// 3 Medium jump. Groups up to two very separated 
 	// 4 Medium jump closer. Groups up to two less separated
 	
+	// 6 Medium background. Individual sticks medium separation, long series allowed
+	// 7 Medium background closer. Individual sticks less separated, long seris allowed
+	// 8 Medium background short series. Groups up to two sticks less separated, shorter series
+	
 
     //                                            0         1        2        3        4        5        6       7          8       9       10      11      12      13      14 
     //                                            0      Tutorial  Easy    Medium   Medium   Dialog   Medium   Medium    Medium  Waves    Dialog      3        4      5        6       7      8       9       10      11      12      13      14 
