@@ -1029,9 +1029,9 @@
 						}
 						else
 						{
-							spawnInforeground = true;
+							spawnInForeground = true;
 						}
-						
+												
 						
 						stickElements[spawnableIndex].style.display = "block";
 						if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
