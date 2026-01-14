@@ -168,7 +168,6 @@
     
     var stickKillDistance = 1200;
     
-    var stickSpawnGroupMaxMissedChances = 3;
 
     var stickElements;
     var numSticks = 20;
@@ -190,6 +189,7 @@
 
     var stickLastSpawnGroupChanceX;
     var stickSpawnGroupMissedChances;
+	var stickSpawnGroupHittedChances;
     
     // Waves
     
@@ -723,6 +723,7 @@
 						
 						stickLastSpawnGroupChanceX = sceneWidth;
 						stickSpawnGroupMissedChances = 0;
+						stickSpawnGroupHittedChances = 0;
 						
 						stickSpawnBackgroundSerieIsForeground = false;
 						stickSpawnBackgroundSerieCount = 0;
@@ -993,7 +994,7 @@
 		
 		if(levelModes[level] == lmJump || levelModes[level] == lmBack)
 		{
-			var spawnGroupChance = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupChances[level];
+			var spawnGroup = (Math.floor((Math.random() * 100)) < levelStickSpawnGroupChances[level]);
 
 			if(sceneWidth - stickLastSpawnGroupChanceX > levelStickSpawnGroupSeparation[level] && levelState == levelStatePlaying)
 			{
@@ -1001,7 +1002,8 @@
 				
 				if(spawnableIndex >= 0)
 				{
-					if((spawnGroupChance == 0 || stickSpawnGroupMissedChances >= stickSpawnGroupMaxMissedChances))
+					if((spawnGroup || stickSpawnGroupMissedChances >= levelStickSpawnMaxChanceMisses[level]) &&
+					  !(stickSpawnGroupHittedChances >= levelStickSpawnMaxChanceHits[level]))
 					{
 						var spawnInForeground;
 						
@@ -1056,12 +1058,14 @@
 							}
 						}
 						
+						stickSpawnGroupHittedChances ++;
 						stickSpawnGroupMissedChances = 0;
 					}
 					else
 					{
 						stickElements[spawnableIndex].style.display = "none";
 						
+						stickSpawnGroupHittedChances = 0;
 						stickSpawnGroupMissedChances ++;
 					}
 					stickPositionsX[spawnableIndex] = sceneWidth;
