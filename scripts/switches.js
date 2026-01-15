@@ -5,4 +5,4 @@
 	var minigameSwitchNoSound = false;
 	
 	var minigameSwitchStartLevel = 10;
-    var minigameSwitchFastForwardMultiplier = 3;
+    var minigameSwitchFastForwardMultiplier = 6;

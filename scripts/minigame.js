@@ -88,9 +88,12 @@
     var soundAmbientMusicElement;
     var soundJumpVolume = 0.15;
     var soundJumpElement;    
-    var soundAmbientVolume = 1;
-    var soundAmbientTargetVolume;
-    var soundAmbientElement;
+    var soundAmbientWindVolume = 1;
+    var soundAmbientWindTargetVolume;
+    var soundAmbientWindElement;
+    var soundAmbientWaterVolume = 0;
+    var soundAmbientWaterTargetVolume;
+    var soundAmbientWaterElement;
     
     var soundVolumeChangeSpeed = 0.2;    
     
@@ -226,7 +229,7 @@
 	var endingHopePositionXLeft = 347;
 	var endingHopePositionXRight = 900;
 	var endingHopeDone = false;
-	var endingShipSpeedX = 150;
+	var endingShipSpeedX = 100;
 	var endingShipPositionXRight = 327;
 	var endingLetterElement;	
     var endingLetterPositionY;
@@ -417,7 +420,8 @@
         // Start music
         
         soundAmbientMusicTargetVolume = levelAmbientMusicVolume[0];
-        soundAmbientTargetVolume = levelAmbientSoundVolume[0];
+        soundAmbientWindTargetVolume = levelAmbientWindVolume[0];
+        soundAmbientWaterTargetVolume = levelAmbientWaterVolume[0];
         
         // Start parallax
         
@@ -637,7 +641,8 @@
                     glowForegroundElement.style.opacity = levelGlowForeground[level + 1];
                     glowBackgroundElement.style.opacity = levelGlowBackground[level + 1];
                     soundAmbientMusicTargetVolume = levelAmbientMusicVolume[level + 1];
-                    soundAmbientTargetVolume = levelAmbientSoundVolume[level + 1];
+                    soundAmbientWindTargetVolume = levelAmbientWindVolume[level + 1];
+                    soundAmbientWaterTargetVolume = levelAmbientWaterVolume[level + 1];
 
                     console.log("Changing level");
 					
@@ -874,8 +879,9 @@
         var isBackgroundMode = (levelModes[level] == lmBack);
 		var isWavesMode = (levelModes[level] == lmWaves);
 		var isJumpMode = (levelModes[level] == lmJump || levelModes[level] == lmNull);
+        var isEndMode = levelModes[level] == lmEnding;
         
-        if(inputActionWasPressed && !shipJumping && !shipDead)
+        if(inputActionWasPressed && !shipJumping && !shipDead && !isEndMode)
         {
 			if(isJumpMode)
 			{
@@ -925,10 +931,7 @@
                 shipJumping = false;
                 shipElement.style.rotate = "0deg";
 				
-				if(isWavesMode)
-				{
-					shipSpeedX = shipReturnSpeedX;
-				}
+                shipSpeedX = shipReturnSpeedX;
 
             }
         }
@@ -1219,6 +1222,8 @@
             }
             else if(endingState == endingStateLetter)
             {
+                shipPosX = endingShipPositionXRight;
+                
 				if(!endingLetterDone)
 				{
 					endingLetterPositionY += endingLetterSpeed * minigameTimeStep;
@@ -1260,9 +1265,6 @@
 					MinigameExitPlay();                    
 					minigameState = minigameStateWelcome;
 					MinigameEnterWelcome();
-					
-					//minigameState = minigameStateGameOver;
-					//MinigameEnterGameOver();                    
 					
 				}
 				
@@ -1346,7 +1348,8 @@
             if(!soundIsPlaying)
             {
                 soundAmbientMusicElement.play();
-                soundAmbientElement.play();
+                soundAmbientWindElement.play();
+                soundAmbientWaterElement.play();
                 soundIsPlaying = true;
             }
 
@@ -1445,14 +1448,19 @@
         soundAmbientMusicElement.volume = 0;
         soundAmbientMusicElement.loop = true;
 
-        soundAmbientElement = document.getElementById("ambientSound");
-        soundAmbientElement.volume = 1;
-        soundAmbientElement.loop = true;
+        soundAmbientWindElement = document.getElementById("ambientWind");
+        soundAmbientWindElement.volume = 1;
+        soundAmbientWindElement.loop = true;
+
+        soundAmbientWaterElement = document.getElementById("ambientWater");
+        soundAmbientWaterElement.volume = 0;
+        soundAmbientWaterElement.loop = true;
 
 		if(minigameSwitchNoSound)
         {
             soundAmbientMusicElement.volume = 0;
-            soundAmbientElement.volume = 0;
+            soundAmbientWindElement.volume = 0;
+            soundAmbientWaterElement.volume = 0;
         }
 
         soundIsPlaying = false;
@@ -1506,26 +1514,43 @@
                 }
             }
             
-            if(soundAmbientVolume < soundAmbientTargetVolume)
+            if(soundAmbientWindVolume < soundAmbientWindTargetVolume)
             {
-                soundAmbientVolume += soundVolumeChangeSpeed * minigameTimeStep;
-                if(soundAmbientVolume >= soundAmbientTargetVolume)
+                soundAmbientWindVolume += soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientWindVolume >= soundAmbientWindTargetVolume)
                 {
-                    soundAmbientVolume = soundAmbientTargetVolume;
+                    soundAmbientWindVolume = soundAmbientWindTargetVolume;
                 }
             }
-            else if(soundAmbientVolume > soundAmbientTargetVolume)
+            else if(soundAmbientWindVolume > soundAmbientWindTargetVolume)
             {
-                soundAmbientVolume -= soundVolumeChangeSpeed * minigameTimeStep;
-                if(soundAmbientVolume <= soundAmbientTargetVolume)
+                soundAmbientWindVolume -= soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientWindVolume <= soundAmbientWindTargetVolume)
                 {
-                    soundAmbientVolume = soundAmbientTargetVolume;
+                    soundAmbientWindVolume = soundAmbientWindTargetVolume;
                 }
             }            
             
+            if(soundAmbientWaterVolume < soundAmbientWaterTargetVolume)
+            {
+                soundAmbientWaterVolume += soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientWaterVolume >= soundAmbientWaterTargetVolume)
+                {
+                    soundAmbientWaterVolume = soundAmbientWaterTargetVolume;
+                }
+            }
+            else if(soundAmbientWaterVolume > soundAmbientWaterTargetVolume)
+            {
+                soundAmbientWaterVolume -= soundVolumeChangeSpeed * minigameTimeStep;
+                if(soundAmbientWaterVolume <= soundAmbientWaterTargetVolume)
+                {
+                    soundAmbientWaterVolume = soundAmbientWaterTargetVolume;
+                }
+            }            
             
             soundAmbientMusicElement.volume = soundAmbientMusicVolume;
-            soundAmbientElement.volume = soundAmbientVolume;
+            soundAmbientWindElement.volume = soundAmbientWindVolume;
+            soundAmbientWaterElement.volume = soundAmbientWaterVolume;
         }
 
 		if(fadeTimer > 0)
