@@ -73,27 +73,52 @@
 
 	var levelMessages =
 	[
-		"",
-        "Even small actions can have purpose.",
-        "Keep taking one thing at a time.",
-        "Sometimes trouble comes in pairs",
-        "You found the rythm.",
-        "You see no reason, yet you go through.",
-        "Sometimes there is another way.",
-        "7: Part1: Background2.",
-        "8: Part1: Background3.",
-        "9: Part1: Waves.",
-        "You are half way through.",
-        "11",
-        "12",
-        "13",
-        "14",
-        "15",
-        "16",
-        "17",
-	    "18",
-	    "19"
+		/*  0 */ "",
+        /*  1 : Jump    */ "Your journey begins",
+        /*  2 : Jump    */ "That was easy",
+        /*  3 : Jump    */ "Now a little faster",
+        /*  4 : Jump    */ "You got this",
+        /*  5 : Recess  */ "Sometimes we can overcome our problems",
+        /*  6 : Back    */ "yet others we must step aside",
+        /*  7 : Back    */ "Now you must be quicker",
+        /*  8 : Back    */ "",
+        /*  9 : Waves   */ "Be careful!",
+        /* 10 : Recess  */ "This is halfway through",
+        /* 11 : Jump    */ "Now fulfill your purpose",
+        /* 12 : Back    */ "",
+        /* 13 : Jump    */ "",
+        /* 14 : Back    */ "",
+        /* 15 : Back    */ "",
+        /* 16 : Jump    */ "",
+        /* 17 : Wave    */ "",
+        /* 18 : Recess  */ "",
+	    /* 19 : End     */ "",
 	];
+
+	// var levelMessages =
+	// [
+		// /*  0 */ "",
+        // /*  1 */ "Even small actions can have purpose.",
+        // /*  2 */ "You reached this far. Now you can go further.",
+        // /*  3 */ "There is a rythm in all things.",
+        // /*  4 */ "Do you see? You found it.",
+        // /*  5 */ "I will be waiting for you.",
+        // /*  6 */ "You see no reason, yet you go through.",
+        // /*  7 */ "Sometimes there is another way.",
+        // /*  8 */ "7: Part1: Background2.",
+        // /*  9 */ "8: Part1: Background3.",
+        // /* 10 */ "9: Part1: Waves.",
+        // /* 11 */ "You are half way through.",
+        // /* 12 */ "11",
+        // /* 13 */ "12",
+        // /* 14 */ "13",
+        // /* 15 */ "14",
+        // /* 16 */ "15",
+        // /* 17 */ "16",
+        // /* 18 */ "17",
+	    // /* 19 */ "18",
+	    // /* 20 */ "19"
+	// ];
 
 	// SpawnGroupChances  1 -> 100%  2-> 50%  3-> 33% ...
 		
@@ -118,9 +143,9 @@
     //                                            0       Jump     Jump     Jump     Jump              Back     Back      Back    Easy              Jump      Back    Jump      Back     Back    Jump     Hard                 12 
     //                                            0                                 Closer                     Closer    Narrow     3              Closer    Narrow  Closer    Narrow   Narrow  Closer      3                  12 
     var levelModes                           = [ _null  , _jump  , _jump  , _jump  , _jump  , _null  , _back  , _back  , _back  , _wave  , _null  , _jump  , _back  , _jump  , _back  , _back  , _jump  , _wave  , _null  ,  _end ];
-    var levelDuration                        = [     2  ,    12  ,    16  ,    16  ,    16  ,     5  ,    16  ,    16  ,    16  ,    32  ,     5  ,    16  ,    16  ,    16  ,    16  ,    16  ,    16  ,    64  ,     2  ,    20 ];
-    var levelMessageDurations                = [     3  ,     3  ,     3  ,     3  ,     3  ,     5  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3 ];
-    var levelSpeedX                          = [  -100  ,  -360  ,  -360  ,  -460  ,  -460  ,  -100  ,  -460  ,  -460  ,  -460  ,  -400  ,  -100  ,  -500  ,  -500  ,  -500  ,  -500  ,  -560  ,  -560  ,  -560  ,  -150  ,  -100 ];
+    var levelDuration                        = [     2  ,    12  ,    16  ,    16  ,    16  ,     1  ,    16  ,    16  ,    16  ,    32  ,     1  ,    16  ,    16  ,    16  ,    16  ,    16  ,    16  ,    64  ,     2  ,    20 ];
+    var levelMessageDurations                = [     0  ,     3  ,     3  ,     3  ,     3  ,     4  ,     3  ,     3  ,     0  ,     3  ,     4  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3  ,     3 ];
+    var levelSpeedX                          = [  -100  ,  -360  ,  -360  ,  -460  ,  -460  ,  -460  ,  -460  ,  -460  ,  -460  ,  -400  ,  -400  ,  -500  ,  -500  ,  -500  ,  -500  ,  -560  ,  -560  ,  -560  ,  -150  ,  -100 ];
     var levelStickSpawnGroupSeparation       = [     0  ,   920  ,   550  ,   550  ,   550  ,     0  ,   550  ,   280  ,   340  ,     0  ,     0  ,   480  ,   280  ,   380  ,   280  ,   340  ,   380  ,     0  ,     0  ,   300 ];
     var levelStickSpawnGroupChances          = [     0  ,   100  ,    50  ,   100  ,    50  ,     0  ,    50  ,   100  ,   100  ,     0  ,     0  ,    60  ,    80  ,    75  ,    80  ,   100  ,    90  ,     0  ,     0  ,    50 ];
     var levelStickSpawnMaxChanceHits         = [     0  ,     3  ,     3  ,     3  ,     3  ,     0  ,     3  ,     3  ,     3  ,     0  ,     0  ,     3  ,     3  ,     3  ,     4  ,  1000  ,     3  ,     0  ,     0  ,     0 ];
@@ -137,10 +162,10 @@
 	var levelWavesSpeedMax			         = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,    60  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,    65  ,     0  ,     0 ];
 	var levelWavesChangeIntervalMin          = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     2  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     1  ,     0  ,     0 ];
 	var levelWavesChangeIntervalMax          = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     4  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     3  ,     0  ,     0 ];
-	var levelGlowBackground                  = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,   0.1  ,   0.1  ,   0.1  ,   0.1  ,   0.2  ,   0.2  ,   0.2  ,   0.2  ,   0.2  ,   0.4  ,   0.4  ,   0.4  ,   0.4  ,   0.9 ];
-    var levelGlowForeground                  = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,  0.01  ,  0.01  ,  0.01  ,  0.01  ,  0.02  ,  0.02  ,  0.02  ,  0.02  ,  0.02  ,  0.03  ,  0.03  ,  0.03  ,  0.03  ,  0.04 ];
-    var levelAmbientMusicVolume              = [     0  ,     0  ,     0  ,     0  ,     0  ,  0.01  ,     0  ,     0  ,     0  ,     0  ,  0.02  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,  0.25  ,  0.35  ,   0.5 ];
-    var levelAmbientWindVolume               = [   0.1  ,  0.10  ,  0.10  ,  0.20  ,  0.20  ,   0.1  ,  0.30  ,  0.30  ,  0.30  ,   0.4  ,   0.1  ,  0.40  ,  0.40  ,  0.40  ,  0.40  ,  0.50  ,  0.50  ,   0.5  ,     0  ,   0.0 ];
-    var levelAmbientWaterVolume              = [  0.05  ,  0.05  ,  0.05  ,  0.05  ,  0.05  ,     0  ,  0.07  ,  0.07  ,  0.07  ,   0.5  ,     0  ,  0.10  ,  0.10  ,  0.10  ,  0.15  ,  0.15  ,  0.15  ,   0.7  ,     0  ,     0 ];
+	var levelGlowBackground                  = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,   0.3  ,   0.3  ,   0.3  ,   0.5  ,   0.5  ,   0.5  ,   0.7  ,   0.7  ,   0.7  ,   0.9 ];
+    var levelGlowForeground                  = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,  0.04  ,  0.04  ,  0.04  ,  0.08  ,  0.08  ,  0.08  ,  0.12  ,  0.12  ,  0.12  ,  0.20 ];
+    var levelAmbientMusicVolume              = [     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,     0  ,  0.05  ,  0.05  ,  0.05  ,  0.10  ,  0.15  ,  0.20  ,  0.25  ,  0.30  ,  0.35  ,   0.5 ];
+    var levelAmbientWindVolume               = [   0.1  ,  0.10  ,  0.10  ,  0.20  ,  0.20  ,  0.30  ,  0.30  ,  0.30  ,  0.30  ,   0.4  ,   0.5  ,  0.40  ,  0.40  ,  0.40  ,  0.40  ,  0.50  ,  0.50  ,   0.5  ,     0  ,     0 ];
+    var levelAmbientWaterVolume              = [  0.05  ,  0.05  ,  0.05  ,  0.05  ,  0.05  ,  0.05  ,  0.07  ,  0.07  ,  0.07  ,   0.5  ,  0.10  ,  0.10  ,  0.10  ,  0.10  ,  0.15  ,  0.15  ,  0.15  ,   0.7  ,     0  ,     0 ];
 
 

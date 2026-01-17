@@ -95,7 +95,7 @@
     var soundAmbientWaterTargetVolume;
     var soundAmbientWaterElement;
     
-    var soundVolumeChangeSpeed = 0.2;    
+    var soundVolumeChangeSpeed = 0.05;    
     
     // Scene
     
