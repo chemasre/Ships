@@ -217,7 +217,7 @@
 	
 	var wavesTargetPositionX = -300;
 	var wavesTargetSeparation = 1200;
-	var wavesCollisionOffset = 307 * 0.7;
+	var wavesCollisionOffset = 307 * 0.8;
 	var wavesCollisionWidth = 100 * 0.7;
 	var wavesSpeed = 10;
 	var wavesChangeTimer = 2;
