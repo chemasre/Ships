@@ -1,5 +1,5 @@
     var minigameSwitchStartAtLevel = false;
-    var minigameSwitchFastForward = true;
+    var minigameSwitchFastForward = false;
     var minigameSwitchNoDamage = false;
 	var minigameSwitchNoSticks = false;
 	var minigameSwitchNoSound = false;

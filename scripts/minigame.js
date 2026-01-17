@@ -84,15 +84,15 @@
     
     var soundIsPlaying;
     var soundAmbientMusicVolume = 0;
-    var soundAmbientMusicTargetVolume;
+    var soundAmbientMusicTargetVolume = 0;
     var soundAmbientMusicElement;
     var soundJumpVolume = 0.15;
     var soundJumpElement;    
     var soundAmbientWindVolume = 1;
-    var soundAmbientWindTargetVolume;
+    var soundAmbientWindTargetVolume = 0;
     var soundAmbientWindElement;
     var soundAmbientWaterVolume = 0;
-    var soundAmbientWaterTargetVolume;
+    var soundAmbientWaterTargetVolume = 0;
     var soundAmbientWaterElement;
     
     var soundVolumeChangeSpeed = 0.05;    
@@ -270,7 +270,7 @@
     function MinigameInitPlay()
     {
 		var storedRecord = localStorage.getItem("record");
-		console.log("Recovered record " + storedRecord);
+		console.log("STORAGE: Recovered record " + storedRecord);
 		
 		if(storedRecord != null) { minigameRecordPoints = parseInt(storedRecord); minigameRecordExists = true; }
 		else { minigameRecordPoints = 0; minigameRecordExists = false; }
@@ -523,7 +523,7 @@
 		if(storeRecord)
 		{
 			localStorage.setItem("record", minigamePoints.toString());
-			console.log("Stored: " + minigamePoints.toString());
+			console.log("STORAGE: Stored record " + minigamePoints.toString());
 			
 		}
 
@@ -644,7 +644,7 @@
                     soundAmbientWindTargetVolume = levelAmbientWindVolume[level + 1];
                     soundAmbientWaterTargetVolume = levelAmbientWaterVolume[level + 1];
 
-                    console.log("Changing level");
+                    console.log("GAMEPLAY: Changing level");
 					
 					if(levelModes[level] == lmWaves)
 					{
@@ -785,7 +785,7 @@
                     level ++;
                     
                     
-                    console.log("Increased level");
+                    console.log("GAMEPLAY: Increased level");
                 }
                             
             }
@@ -840,18 +840,23 @@
                 
                 if(index >= 0)
                 {
-                    console.log("Spawning object at plane " + (i + 1));
+                    console.log("PARALLAX: Spawning object at plane " + (i + 1));
                     
-                    parallaxObjectsX[i][index] = sceneWidth;
+                    parallaxObjectElements[i][index].style.display = "block";
+
+                    var e = parallaxObjectElements[i][index];
+                    var rotation = MinigameRandomRange(parallaxObjectsRotationMin[i][index], parallaxObjectsRotationMax[i][index]);
+                    var spawnX = sceneWidth + (rotation != 0 ? Math.max(e.offsetWidth, e.offsetHeight) / 2 : 0);
+                    
+                    parallaxObjectsX[i][index] = spawnX;
                     parallaxObjectElements[i][index].style.top = MinigameRandomRange(parallaxObjectsYMin[i][index], parallaxObjectsYMax[i][index]) + "px";
-                    parallaxObjectElements[i][index].style.rotate = MinigameRandomRange(parallaxObjectsRotationMin[i][index], parallaxObjectsRotationMax[i][index]) + "deg";
+                    parallaxObjectElements[i][index].style.rotate = rotation + "deg";
                     parallaxObjectElements[i][index].style.zIndex = zIndexParallaxObject;
 
                     
 					parallaxObjectsSpeedFactor[i][index] = MinigameRandomRange(parallaxObjectsSpeedFactorMin, parallaxObjectsSpeedFactorMax);
-                    parallaxObjectElements[i][index].style.display = "block";
                     
-                    parallaxLastSpawnX[i] = sceneWidth;
+                    parallaxLastSpawnX[i] = spawnX;
                     
                     parallaxSeparation[i] = MinigameRandomRange(parallaxMinSeparation[i], parallaxMaxSeparation[i]);
 
@@ -1042,8 +1047,6 @@
 						if(minigameSwitchNoSticks) { stickElements[spawnableIndex].style.display = "none"; }
 
 						var groupMembers = Math.floor((Math.random() * 1000)) % levelStickSpawnGroupMaxMembers[level];
-						
-						//console.log("Spawned group with " + (groupMembers + 1) + " members");
 						
 						for(var i = 0; i < groupMembers; i++)
 						{
@@ -1326,7 +1329,7 @@
     {
         welcomeElement.style.opacity = 0;
         welcomeDisclaimer.style.opacity = 0;
-        console.log("Finishing welcome");
+        console.log("MENU: Finishing welcome");
     }
     
     function MinigameUpdateWelcome()
@@ -1382,7 +1385,7 @@
 
         gameOverRestart.style.opacity = 0;
 		
-		console.log("Entering game over");
+		console.log("MENU: Entering game over");
                 
         gameOverRestartTimer = gameOverRestartDelay;
                              
@@ -1423,7 +1426,7 @@
                     minigameState = minigameStatePlay;
 					MinigameStartFade();					
                     MinigameEnterPlay();
-                    console.log("Going to play");
+                    console.log("MENU: Going to play");
                 }
                 
             }
@@ -1487,14 +1490,13 @@
             minigameSwitchFastForwardPressed = false;
             
             minigameSwitchFastForwardSavedTimeStep = minigameTimeStep;
-        }
+        }        
         
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
     }
    
     function MinigameUpdate()
     {
-        
         if(soundIsPlaying)
         {
             if(soundAmbientMusicVolume < soundAmbientMusicTargetVolume)
@@ -1579,13 +1581,16 @@
     
         inputActionWasPressed = false;
         
-        if(minigameSwitchFastForward && minigameSwitchFastForwardPressed)
+        if(minigameSwitchFastForward)
         {
-            minigameTimeStep = minigameSwitchFastForwardSavedTimeStep * minigameSwitchFastForwardMultiplier;
-        }
-        else
-        {
-            minigameTimeStep = minigameSwitchFastForwardSavedTimeStep;
+            if(minigameSwitchFastForwardPressed)
+            {
+                minigameTimeStep = minigameSwitchFastForwardSavedTimeStep * minigameSwitchFastForwardMultiplier;
+            }
+            else
+            {
+                minigameTimeStep = minigameSwitchFastForwardSavedTimeStep;
+            }
         }
 
         window.setTimeout(MinigameUpdate, 1000.0 / minigameFps );
@@ -1600,7 +1605,7 @@
         else if(e.key == "f" && minigameSwitchFastForward)
         {
             minigameSwitchFastForwardPressed = true;
-            console.log("FF on");
+            console.log("SWITCHES: Fast forward on");
         }
     }
     
@@ -1609,7 +1614,7 @@
         if(e.key == "f" && minigameSwitchFastForward)
         {
             minigameSwitchFastForwardPressed = false;
-            console.log("FF off");
+            console.log("SWITCHES: Fast forward off");
         }
     }
 
