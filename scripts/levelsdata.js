@@ -45,30 +45,11 @@
 		// "No compass can help me",
 		// "Unable to find the words that ",
 		// "8:",
-		// "7:",
+		// "7:", 
 		// "6:",
 		// "5:",
 		// "4:",
 		// "3:",
-	// ];
-
-	// var levelMessages =
-	// [
-		// "",
-        // "1: Part1: Jump1",
-        // "2: Part1: Jump2",
-        // "3: Part1: Jump3",
-        // "4: Part1: Jump4",
-        // "5: Part1: Dialogs1",
-        // "6: Part1: Background1",
-        // "7: Part1: Background2",
-        // "8: Part1: Background3",
-        // "9: Part1: Waves",
-        // "10: Part1: Dialogs2",
-        // "11",
-        // "12",
-        // "13",
-        // "14",
 	// ];
 
 	var levelMessages =
@@ -83,48 +64,19 @@
         /*  7 : Back    */ "yet others we must step aside",
         /*  8 : Back    */ "Now you must be quicker",
         /*  9 : Back    */ "",
-        /* 10 : Waves   */ "Be careful!",
-        /* 11 : Recess  */ "This is halfway through",
-        /* 12 : Jump    */ "Go find your purpose",
-        /* 13 : Back    */ "",
-        /* 14 : Jump    */ "",
-        /* 15 : Back    */ "",
+        /* 11 : Waves   */ "Find you place in the gap",
+        /* 12 : Recess  */ "This is halfway",
+        /* 13 : Jump    */ "Now seek you purpose",
+        /* 14 : Back    */ "",
+        /* 15 : Jump    */ "",
         /* 16 : Back    */ "",
-        /* 17 : Jump    */ "",
-        /* 18 : Wave    */ "",
-        /* 19 : Recess  */ "",
-	    /* 20 : End     */ "",
+        /* 17 : Back    */ "",
+        /* 18 : Jump    */ "",
+        /* 19 : Wave    */ "",
+        /* 20 : Recess  */ "",
+	    /* 21 : End     */ "",
 	];
 
-	// var levelMessages =
-	// [
-		// /*  0 */ "",
-        // /*  1 */ "Even small actions can have purpose.",
-        // /*  2 */ "You reached this far. Now you can go further.",
-        // /*  3 */ "There is a rythm in all things.",
-        // /*  4 */ "Do you see? You found it.",
-        // /*  5 */ "I will be waiting for you.",
-        // /*  6 */ "You see no reason, yet you go through.",
-        // /*  7 */ "Sometimes there is another way.",
-        // /*  8 */ "7: Part1: Background2.",
-        // /*  9 */ "8: Part1: Background3.",
-        // /* 10 */ "9: Part1: Waves.",
-        // /* 11 */ "You are half way through.",
-        // /* 12 */ "11",
-        // /* 13 */ "12",
-        // /* 14 */ "13",
-        // /* 15 */ "14",
-        // /* 16 */ "15",
-        // /* 17 */ "16",
-        // /* 18 */ "17",
-	    // /* 19 */ "18",
-	    // /* 20 */ "19"
-	// ];
-
-	// SpawnGroupChances  1 -> 100%  2-> 50%  3-> 33% ...
-		
-	// Stick group separation 80
-	
 	// 1 Tutorial jump. Individual sticks very separated
 	// 2 Easy jump. Individual sticks less separated but with gaps
 	// 3 Medium jump. Groups up to two very separated 
