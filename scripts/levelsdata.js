@@ -65,7 +65,7 @@
         /*  8 : Back    */ "Now you must be quicker",
         /*  9 : Back    */ "",
         /* 11 : Waves   */ "If you face colossal powers",
-        /* 12 : Waves   */ "surviving is enough",
+        /* 12 : Waves   */ "resisting is enough",
         /* 13 : Recess  */ "This is halfway",
         /* 14 : Jump    */ "May your will lead you to the end",
         /* 15 : Back    */ "",
