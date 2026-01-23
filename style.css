@@ -31,7 +31,6 @@ body
 	
 	overflow:hidden;
 	
-	
 }
 
 #welcomeDisclaimer
@@ -307,6 +306,8 @@ body
 	left:50%;
 	top:50%;
 	transform:translate(-50%, -50%) scale(calc(100vw / (900px + 200pt)));
+    overflow: hidden;
+
     
 }
 
