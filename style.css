@@ -25,7 +25,7 @@
 {
     :root
     {
-      --minigameMargin: 0pt;
+      --minigameMargin: 10pt;
     }
 }
 
@@ -42,6 +42,7 @@ body
     background-image:url('images/web-background.png');
 	font-family: helvetica, arial, sans-serif;
 	
+    min-height:100vh;
 	/*overflow:hidden;*/
 	
 }
@@ -316,11 +317,10 @@ body
 #minigame
 {
 	display:block;
-	
 	position:absolute;
 	left:calc(100vw / 2);
 	top:calc(100vh / 2);
-	transform:translate(-50%, -50%) scale(calc(min(100vw / (900px + var(--minigameMargin) * 2), 100vh / (360px + var(--minigameMargin) * 2))));
+	transform:translate(-50%, -50%) scale(calc(min(100vw  / (900px + var(--minigameMargin) * 2), 100vh / (360px + var(--minigameMargin) * 2))));
     overflow: hidden;
 
     
