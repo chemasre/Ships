@@ -16,6 +16,19 @@
 	
 }
 
+:root
+{
+  --minigameMargin: 100pt;
+}
+
+@media (hover: none) and (pointer: coarse)
+{
+    :root
+    {
+      --minigameMargin: 5pt;
+    }
+}
+
 em
 {
 	font-style:normal;
@@ -298,6 +311,8 @@ body
 	opacity:0.4;
 }
 
+
+
 #minigame
 {
 	display:block;
@@ -305,15 +320,10 @@ body
 	position:absolute;
 	left:calc(100vw / 2);
 	top:calc(100vh / 2);
-	transform:translate(-50%, -50%) scale(calc(min(100vw / (900px + 200pt), 100vh / (360px + 200pt))));
+	transform:translate(-50%, -50%) scale(calc(min(100vw / (900px + var(--minigameMargin) * 2), 100vh / (360px + var(--minigameMargin) * 2))));
     overflow: hidden;
 
     
-}
-
-@media only screen and (hover: none) and (pointer: coarse)
-{
-    transform:translate(-50%, -50%) scale(calc(min(100vw / (900px + 30pt), 100vh / (360px + 30pt))));
 }
 
 
