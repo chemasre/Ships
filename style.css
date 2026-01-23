@@ -303,9 +303,9 @@ body
 	display:block;
 	
 	position:absolute;
-	left:50%;
-	top:50%;
-	transform:translate(-50%, -50%) scale(calc(100vw / (900px + 200pt)));
+	left:calc(100vw / 2);
+	top:calc(100vh / 2);
+	transform:translate(-50%, -50%) scale(calc(min(100vw / (900px + 100pt), 100vh / (360px + 100pt))));
     overflow: hidden;
 
     
