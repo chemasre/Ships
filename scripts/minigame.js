@@ -1481,6 +1481,8 @@
         
         document.addEventListener('keydown', MinigameOnKeyDown);
         document.addEventListener('click', MinigameOnClick);
+        document.addEventListener('touchstart', MinigameOnTouch);
+        document.addEventListener('touchend', MinigameOnTouchEnd);
 
         minigameTimeStep = 1.0 / minigameFps;
         
@@ -1621,6 +1623,17 @@
     function MinigameOnClick(e)
     {
         inputActionWasPressed = true;
+    }
+    
+    function MinigameOnTouch()
+    {
+        inputActionWasPressed = true;
+    }
+
+    function MinigameOnTouchEnd(e)
+    {
+        // Prevent the click event
+        e.preventDefault();
     }
 	
 	function MinigameRandomRange(a, b)
