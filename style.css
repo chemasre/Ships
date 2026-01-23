@@ -25,7 +25,7 @@
 {
     :root
     {
-      --minigameMargin: 5pt;
+      --minigameMargin: 0pt;
     }
 }
 
@@ -42,7 +42,7 @@ body
     background-image:url('images/web-background.png');
 	font-family: helvetica, arial, sans-serif;
 	
-	overflow:hidden;
+	/*overflow:hidden;*/
 	
 }
 
