@@ -13,6 +13,10 @@
     -webkit-user-drag: none;
     -moz-user-drag: none;
     -ms-user-drag: none;	
+    
+    /* Prevents double tap zoom in mobile */
+    touch-action: manipulation;
+    
 	
 }
 
