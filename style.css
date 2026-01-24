@@ -264,7 +264,7 @@ body
 {
 	display:block;
 
-	opacity: 0.0;
+	opacity:    0.0;
 	transition: opacity 0.5s ease-in-out;
 	
 	text-shadow: 0 0 10px #fff;
@@ -320,10 +320,22 @@ body
 	position:absolute;
 	left:calc(100vw / 2);
 	top:calc(100vh / 2);
-	transform:translate(-50%, -50%) scale(calc(min(100vw  / (900px + var(--minigameMargin) * 2), 100vh / (360px + var(--minigameMargin) * 2))));
+	transform:translate(-50%, -50%) scale(min(100vw  / (900px + var(--minigameMargin) * 2), 100vh / (360px + var(--minigameMargin) * 2)));
     overflow: hidden;
-
-    
+   
 }
+
+@-moz-document url-prefix()
+{
+    /* Firefox doesn't evaluate the division of things like 2px / 2rem as an unitless value that can be passed to scale,
+       so adjusting the layout the way is done with other browsers is not possible
+       see: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Values/calc#browser_compatibility */
+    
+    #minigame
+    {
+        transform:translate(-50%, -50%);
+       
+    }
+} 
 
 
